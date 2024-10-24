@@ -1,4 +1,4 @@
-﻿namespace Delta.Net {
+﻿namespace DeltaLake {
     /// <summary>
     /// Global values.
     /// CI should run envsubst to put actual values inside it. Prefer global constants to reflection as reflection is not

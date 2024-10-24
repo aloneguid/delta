@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Delta.Net.Log.Actions {
+namespace DeltaLake.Log.Actions {
     public class AddRemoveFilePoco {
         /// <summary>
         /// A relative path to a data file from the root of the table or an absolute path to a file that should be added to the table.

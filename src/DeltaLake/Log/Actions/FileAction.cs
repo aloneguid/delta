@@ -1,4 +1,4 @@
-﻿namespace Delta.Net.Log.Actions {
+﻿namespace DeltaLake.Log.Actions {
     public abstract class FileAction : Action {
 
         protected readonly AddRemoveFilePoco _data;

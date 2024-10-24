@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Delta.Net.Log.Actions {
+namespace DeltaLake.Log.Actions {
 
     public abstract class Action {
         public DeltaAction DeltaAction { get; set; }

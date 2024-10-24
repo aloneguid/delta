@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Delta.Net.Log.Actions {
+namespace DeltaLake.Log.Actions {
     class ProtocolEvolutionActionPoco {
         /// <summary>
         /// The minimum version of the Delta read protocol that a client must implement in order to correctly read this table

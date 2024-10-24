@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
-using Delta.Net.Log.Actions;
+using DeltaLake.Log.Actions;
 using Stowage;
-using Action = Delta.Net.Log.Actions.Action;
+using Action = DeltaLake.Log.Actions.Action;
 
-namespace Delta.Net.Log {
+namespace DeltaLake.Log {
 
     /// <summary>
     /// Implements delta log protocol as per https://github.com/delta-io/delta/blob/master/PROTOCOL.md#delta-log-entries
@@ -24,7 +24,7 @@ namespace Delta.Net.Log {
         private async Task ReadActions() {
             _actions.Clear();
 
-            foreach(IOEntry entry in _entries) {
+            foreach(IOEntry entry in _entries)
                 if(entry.Name.EndsWith(".json")) {
                     string? content = await _storage.ReadText(entry.Path);
                     if(content == null)
@@ -39,7 +39,6 @@ namespace Delta.Net.Log {
                         _actions.Add(Action.CreateFromJsonObject(uDoc.Keys.First(), je));
                     }
                 }
-            }
         }
 
         public async Task OpenAsync() {
@@ -61,13 +60,10 @@ namespace Delta.Net.Log {
                     var fa = (FileAction)action;
                     string path = fa.Path;
 
-                    if(action.DeltaAction == DeltaAction.AddFile) {
+                    if(action.DeltaAction == DeltaAction.AddFile)
                         files.Add(path);
-                    } else {
-                        if(!files.Remove(path)) {
-                            throw new InvalidDataException($"file {path} not found in the list of files");
-                        }
-                    }
+                    else if(!files.Remove(path))
+                        throw new InvalidDataException($"file {path} not found in the list of files");
                 }
             }
 

@@ -1,4 +1,4 @@
-﻿namespace Delta.Net.Log.Actions {
+﻿namespace DeltaLake.Log.Actions {
     /// <summary>
     /// Additional provenance information about what higher-level operation was being performed as well as who executed it.
     /// Implementations are free to store any valid JSON-formatted data via the commitInfo action.

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Delta.Net.Log.Actions {
+namespace DeltaLake.Log.Actions {
     internal class ChangeMetadataPoco {
         /// <summary>
         /// Unique identifier for this table

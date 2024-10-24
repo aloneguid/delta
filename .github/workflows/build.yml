@@ -2,7 +2,7 @@
 
 env:
   VERSION: 0.0.0
-  PACKAGE_SUFFIX: '-pre.1'
+  PACKAGE_SUFFIX: '-pre.2'
   # PACKAGE_SUFFIX: ''
   ASM_VERSION: 0.0.0
 
@@ -66,7 +66,7 @@ jobs:
         echo "${{ env.VERSION }}" >> artifacts/version.txt
         cp docs/release-history.md artifacts/
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       name: upload artifacts
       with:
         name: bin

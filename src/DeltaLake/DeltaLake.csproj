@@ -28,7 +28,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>
@@ -43,7 +43,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Parquet.Net" Version="5.0.0" />
+        <PackageReference Include="Parquet.Net" Version="5.0.1" />
         <PackageReference Include="Stowage" Version="2.0.1" />
     </ItemGroup>
 

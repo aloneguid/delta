@@ -1,4 +1,4 @@
-﻿namespace Delta.Net.Log.Actions {
+﻿namespace DeltaLake.Log.Actions {
     public class MetadataFormatPoco {
         /// <summary>
         /// Name of the encoding for files in this table
