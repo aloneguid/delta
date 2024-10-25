@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DeltaLake.Log;
+using DeltaLake.Log.Actions;
 using Stowage;
 
 namespace DeltaLake {
@@ -11,23 +12,51 @@ namespace DeltaLake {
         private readonly IFileStorage _storage;
         private readonly IOPath _location;
 
-        private Table(IFileStorage storage, IOPath location) {
+        public Table(IFileStorage storage, IOPath location) {
             _storage = storage;
             _location = location;
             Log = new DeltaLog(storage, location);
         }
 
-        public DeltaLog Log { get; }
+        public DeltaLog Log { get; init; }
 
-        private async Task OpenAsync() {
-            await Log.OpenAsync();
+        /// <summary>
+        /// Opens delta table from disk at given location.
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <returns></returns>
+        public static Table OpenFromDisk(string directoryPath) {
+            if(!Directory.Exists(directoryPath)) {
+                throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");
+            }
+
+            var di = new DirectoryInfo(directoryPath);
+            IFileStorage storage = Files.Of.LocalDisk(di.Parent!.FullName);
+            return new Table(storage, new IOPath(di.Name));
         }
 
-        public static async Task<Table> OpenAsync(IFileStorage storage, IOPath location) {
-            var r = new Table(storage, location);
-            await r.OpenAsync();
-            return r;
-        }
+        /// <summary>
+        /// Determines the list of active data files in the table at the given version.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IReadOnlyCollection<string>> GetFilesAsync() {
 
+            IReadOnlyCollection<LogCommit> history = await Log.ReadHistoryAsync();
+
+            var files = new HashSet<string>();
+
+            foreach(LogCommit commit in history) {
+                foreach(Log.Actions.Action action in commit.Actions) {
+
+                    if(action is AddFileAction afa) {
+                        files.Add(afa.Path);
+                    } else if(action is RemoveFileAction rfa) {
+                        files.Remove(rfa.Path);
+                    }
+                }
+            }
+
+            return files;
+        }
     }
 }

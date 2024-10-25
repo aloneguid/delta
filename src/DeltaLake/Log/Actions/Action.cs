@@ -22,9 +22,9 @@ namespace DeltaLake.Log.Actions {
             else if(name == "metaData")
                 return new ChangeMetadataAction(je.Deserialize<ChangeMetadataPoco>()!);
             else if(name == "add")
-                return new AddFileAction(je.Deserialize<AddRemoveFilePoco>()!);
+                return new AddFileAction(je.Deserialize<AddFilePoco>()!);
             else if(name == "remove")
-                return new RemoveFileAction(je.Deserialize<AddRemoveFilePoco>()!);
+                return new RemoveFileAction(je.Deserialize<RemoveFilePoco>()!);
 
             throw new NotSupportedException($"action '{name}' is not supported");
         }

@@ -6,7 +6,7 @@ namespace DeltaLake.Log.Actions {
         /// Unique identifier for this table
         /// </summary>
         [JsonPropertyName("id")]
-        public Guid Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// User-provided identifier for this table

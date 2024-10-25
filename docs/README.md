@@ -15,7 +15,38 @@ Suppose you want to query a Delta table with on your local machine. DarDeltaLake
 
 ## Status
 
-Very early draft. Nothing is working yet.
+Still early stages.
+
+I can already read and parse delta log, with some understanding of it's file structure.
+
+## Quick start
+
+After installing the nuget package [![NuGet Version](https://img.shields.io/nuget/vpre/DearDeltaLake?style=flat-square)](https://www.nuget.org/packages/DearDeltaLake), find out type of storage your tables are stored in. We will stick with local disk here, but there are plenty of other options.
+
+```csharp
+using DeltaLake;
+
+// open table from the local disk
+Table table = new Table("c:/table/folder");
+```
+
+## Reading
+
+Delta table essentially consists of different parquet files, and to read the table, you essentially need to figure out which parquet files constitute the current version of a delta table. To get the list of those files:
+
+```csharp
+IReadOnlyCollection<string> files = await table.GetFilesAsync();
+```
+
+This returns the list of files at the *latest* version of this table.
+
+## Appending
+
+todo
+
+## Deleting
+
+todo
 
 ## Contributing
 
@@ -26,3 +57,6 @@ Bookmark, star, start discussions if you are interested in the future of this pr
 - [Delta Transaction Log Protocol](https://github.com/delta-io/delta/blob/master/PROTOCOL.md).
 - [Delta Kernel](https://docs.delta.io/latest/delta-kernel.html).
 - [Integration Test Dataset](https://github.com/delta-io/delta-rs/tree/main/crates/test/tests/data).
+- Alternative implementations
+  - [delta-net](https://github.com/johnsusi/delta-net)
+  - [delta-dotnet](https://github.com/delta-incubator/delta-dotnet)

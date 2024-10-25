@@ -5,7 +5,11 @@
 
         internal ChangeMetadataAction(ChangeMetadataPoco data) : base(DeltaAction.Metadata) {
             _data = data;
-            Id = data.Id;
+
+            if(data.Id == null)
+                throw new ArgumentNullException(nameof(data.Id));
+
+            Id = Guid.Parse(data.Id);
             Name = data.Name;
         }
 

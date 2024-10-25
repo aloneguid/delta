@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace DeltaLake.Log.Actions {
-    public class AddRemoveFilePoco {
+    public class AddFilePoco {
         /// <summary>
         /// A relative path to a data file from the root of the table or an absolute path to a file that should be added to the table.
         /// The path is a URI as specified by RFC 2396 URI Generic Syntax, which needs to be decoded to get the data file path.
@@ -32,13 +32,17 @@ namespace DeltaLake.Log.Actions {
         /// be contained in one or more remove actions in the same version.
         /// </summary>
         [JsonPropertyName("dataChange")]
-        public bool DataChange { get; set; }
+        public bool? DataChange { get; set; }
+
+        // todo: stats
 
         /// <summary>
         /// Map containing metadata about this logical file.
         /// </summary>
         [JsonPropertyName("tags")]
         public Dictionary<string, string>? Tags { get; set; }
+
+        // todo: deletionVector
 
         /// <summary>
         /// Default generated Row ID of the first row in the file.
