@@ -9,13 +9,14 @@
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>../fake.snk</AssemblyOriginatorKeyFile>
         <Authors>aloneguid</Authors>
-        <PackageProjectUrl>https://github.com/aloneguid/delta-dotnet</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/aloneguid/delta</PackageProjectUrl>
         <PackageIcon>logo-128x128.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/aloneguid/delta-dotnet</RepositoryUrl>
-        <PackageTags>delta.io deltalake</PackageTags>
+        <PackageTags>delta.io deltalake delta</PackageTags>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageId>DeltaIO</PackageId>
+        <Description>Pure, managed, super fast Delta Lake implementation in .NET.</Description>
 
     </PropertyGroup>
 
