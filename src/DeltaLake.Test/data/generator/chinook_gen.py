@@ -1,7 +1,8 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StringType, StructField, IntegerType
-import pyspark.sql.functions as f
 import os
+
+import pyspark.sql.functions as f
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StringType, IntegerType
 
 spark = (SparkSession
          .builder
@@ -18,22 +19,77 @@ TARGET_DIR = os.path.abspath("../chinook")
 
 #%%
 
-artist_df = spark.read.csv(os.path.abspath("../chinook.csv/Artist.csv"), header=True)
+def read_csv(name: str):
+    return (spark.read
+     .option("header", "true")
+     .option("quote", "\"")
+     .option("escape", "\"")
+     .csv(os.path.abspath(f"../chinook.csv/{name}.csv")))
+
+# Artist table
+artist_df = read_csv("Artist")
+track_df = read_csv("Track")
+playlist_df = read_csv("Playlist")
+playlist_track_df = read_csv("PlaylistTrack")
+
 artist_df = artist_df.withColumn("ArtistId", f.col("ArtistId").cast(IntegerType())).withColumn("Name", f.col("Name").cast(StringType()))
-artist_df.printSchema()
-artist_df.show()
+
+# add row number column to artist_df with increasing values, this will be useful for values partitioning and data generation
+artist_df_rn = (artist_df
+                .withColumn("rn", f.monotonically_increasing_id())
+                .select("rn", *artist_df.columns))
+artist_df_count = artist_df.count()
+
 
 #%%
 
-# write single partition (ArtistSimple
+# single file and single partition (ArtistSimple)
 
 (artist_df
  .repartition(1).write
  .format("delta")
  .mode("overwrite")
- .save(os.path.join(TARGET_DIR, "artist")))
+ .save(os.path.join(TARGET_DIR, "artist.simple")))
 
 
 #%%
 
-# df.repartition(1).write.format("parquet").mode("overwrite").save("C:/dev/dd/delta-dotnet/src/Delta.Net.Test/data/golden/data-reader-array-primitives.parquet")
+# trickling rows
+
+batch_size = 20
+
+for i in range(1, artist_df_count + 1, batch_size):
+    # generate microbatch
+    df_1 = artist_df_rn.filter(artist_df_rn.rn >= i).filter(artist_df_rn.rn < i + batch_size)
+    df_1.show()
+    df_1 = df_1.drop("rn")
+
+    # write microbatch
+    print("-----")
+    print(f"writing microbatch {i}+{batch_size}/{artist_df_count}")
+    (df_1
+     .repartition(1)
+     .write
+     .format("delta")
+     .mode("append" if i > 1 else "overwrite")
+     .save(os.path.join(TARGET_DIR, "artist.trickle")))
+
+print("done")
+
+#%%
+
+# Track table partitioned by MediaTypeId
+
+track_df.printSchema()
+track_df.groupBy("MediaTypeId").count().show()
+
+#%%
+
+(track_df
+ .write
+ .partitionBy("MediaTypeId")
+ .format("delta")
+ .mode("overwrite")
+ .save(os.path.join(TARGET_DIR, "track.partitioned.mediatypeid")))
+
+

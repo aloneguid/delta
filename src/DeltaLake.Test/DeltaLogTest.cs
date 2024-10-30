@@ -10,10 +10,16 @@ namespace DeltaLake.Test {
 
         private readonly IFileStorage _storage;
 
+        const int ArtistRowCount = 275;
+
         public DeltaLogTest() {
             _storage = Files.Of.LocalDisk(Path.GetFullPath(Path.Combine("data")));
         }
 
+        /// <summary>
+        /// Entire Artist table written in one go with a single commit.
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task ArtistSimple() {
             Table table = new Table(_storage, new IOPath("chinook", "artist.simple"));
@@ -51,32 +57,25 @@ namespace DeltaLake.Test {
                 files.Order().ToList());
         }
 
-        //[Fact]
-        public async Task SimpleTableTestAsync() {
-            Table table = new Table(_storage, new IOPath("simple_table"));
-            IReadOnlyCollection<LogCommit> history = await table.Log.ReadHistoryAsync();
+        /// <summary>
+        /// Artist table written in multiple commits, each commit adding a batch of 20 rows.
+        /// This simulates a trickle load with tiny microbatch commits, like in a streaming ETL job.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task ArtistTrickle() {
+            Table table = new Table(_storage, new IOPath("chinook", "artist.trickle"));
 
-            Assert.Equal(74, history.SelectMany(le => le.Actions).Count());
+            IReadOnlyCollection<LogCommit> commits = await table.Log.ReadHistoryAsync();
+
+            // there shoudl be exactly 4 commits (1 checkpointed and 3 json)
+            Assert.Equal(4, commits.Count);
+
+            // file set
 
             IReadOnlyCollection<string> files = await table.GetFilesAsync();
-
-            // check that we have 5 files at the end after replaying all actions
-            Assert.Equal(5, files.Count);
-            Assert.Equal([
-                "part-00000-2befed33-c358-4768-a43c-3eda0d2a499d-c000.snappy.parquet",
-                "part-00000-c1777d7d-89d9-4790-b38a-6ee7e24456b1-c000.snappy.parquet",
-                "part-00001-7891c33d-cedc-47c3-88a6-abcfb049d3b4-c000.snappy.parquet",
-                "part-00004-315835fe-fb44-4562-98f6-5e6cfa3ae45d-c000.snappy.parquet",
-                "part-00007-3a0e4727-de0d-41b6-81ef-5223cf40f025-c000.snappy.parquet"],
-                files.Order().ToList());
-        }
-
-        //[Fact]
-        public async Task SimpleTableWithCheckpointAsync() {
-            Table table = new Table(_storage, new IOPath("simple_table_with_checkpoint"));
-
-            IReadOnlyCollection<LogCommit> history = await table.Log.ReadHistoryAsync();
-            Assert.Equal(13, history.SelectMany(le => le.Actions).Count());
+            // there should be exactly 14 files (batches of 20 rows)
+            Assert.Equal(14, files.Count);
         }
     }
 }

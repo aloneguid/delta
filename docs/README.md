@@ -1,4 +1,4 @@
-# Dear Delta Lake [![NuGet Version](https://img.shields.io/nuget/vpre/DearDeltaLake?style=flat-square)](https://www.nuget.org/packages/DearDeltaLake)
+# Delta.IO [![NuGet Version](https://img.shields.io/nuget/vpre/DeltaIO?style=flat-square)](https://www.nuget.org/packages/DeltaIO)
 
 
 ![](logo.svg)
@@ -21,7 +21,7 @@ I can already read and parse delta log, with some understanding of it's file str
 
 ## Quick start
 
-After installing the nuget package [![NuGet Version](https://img.shields.io/nuget/vpre/DearDeltaLake?style=flat-square)](https://www.nuget.org/packages/DearDeltaLake), find out type of storage your tables are stored in. We will stick with local disk here, but there are plenty of other options.
+After installing the nuget package [![NuGet Version](https://img.shields.io/nuget/vpre/DeltaIO?style=flat-square)](https://www.nuget.org/packages/DeltaIO), find out type of storage your tables are stored in. We will stick with local disk here, but there are plenty of other options.
 
 ```csharp
 using DeltaLake;
