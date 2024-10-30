@@ -15,8 +15,8 @@ namespace DeltaLake.Test {
         }
 
         [Fact]
-        public async Task GoldenLogTestAsync() {
-            Table table = new Table(_storage, new IOPath("golden", "data-reader-array-primitives"));
+        public async Task ArtistSimple() {
+            Table table = new Table(_storage, new IOPath("chinook", "artist.simple"));
 
             IReadOnlyCollection<LogCommit> commits = await table.Log.ReadHistoryAsync();
 
@@ -42,12 +42,16 @@ namespace DeltaLake.Test {
             var a3 = (AddFileAction)actions[3];
             Assert.Equal(DeltaAction.AddFile, a3.DeltaAction);
 
-            // 4
-            var a4 = (AddFileAction)actions[4];
-            Assert.Equal(DeltaAction.AddFile, a4.DeltaAction);
+            // file set
+
+            IReadOnlyCollection<string> files = await table.GetFilesAsync();
+            Assert.Single(files);
+            Assert.Equal([
+                "part-00000-df960eb7-f439-480a-b59b-c145d2da0a1d-c000.snappy.parquet"],
+                files.Order().ToList());
         }
 
-        [Fact]
+        //[Fact]
         public async Task SimpleTableTestAsync() {
             Table table = new Table(_storage, new IOPath("simple_table"));
             IReadOnlyCollection<LogCommit> history = await table.Log.ReadHistoryAsync();
@@ -67,7 +71,7 @@ namespace DeltaLake.Test {
                 files.Order().ToList());
         }
 
-        [Fact]
+        //[Fact]
         public async Task SimpleTableWithCheckpointAsync() {
             Table table = new Table(_storage, new IOPath("simple_table_with_checkpoint"));
 

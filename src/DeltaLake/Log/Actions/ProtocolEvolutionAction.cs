@@ -1,4 +1,6 @@
-﻿namespace DeltaLake.Log.Actions {
+﻿using DeltaLake.Log.Poco;
+
+namespace DeltaLake.Log.Actions {
     public class ProtocolEvolutionAction : Action {
         internal ProtocolEvolutionAction(ProtocolEvolutionActionPoco data) : base(DeltaAction.Protocol) {
             Data = data;

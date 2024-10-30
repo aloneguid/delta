@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using DeltaLake.Log.Poco;
 
 namespace DeltaLake.Log.Actions {
 

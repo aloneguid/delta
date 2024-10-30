@@ -1,9 +1,10 @@
-﻿namespace DeltaLake.Log.Actions {
+﻿using DeltaLake.Log.Poco;
+
+namespace DeltaLake.Log.Actions {
     public class RemoveFileAction : Action {
 
         private readonly RemoveFilePoco _data;
-
-        public RemoveFileAction(RemoveFilePoco data) : base(DeltaAction.RemoveFile) {
+        internal RemoveFileAction(RemoveFilePoco data) : base(DeltaAction.RemoveFile) {
             _data = data;
 
             if(data.Path == null)

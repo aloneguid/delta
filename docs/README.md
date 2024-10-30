@@ -11,7 +11,7 @@ Delta Spark depends on Java and Spark, which is fine for many use cases, but not
 
 DearDeltaLake lets you query Delta tables without depending on Java/Scala.
 
-Suppose you want to query a Delta table with on your local machine. DarDeltaLake makes it easy to query the table with a simple `dotnet add package` command - no need to install Java or Spark.
+Suppose you want to query a Delta table with on your local machine. DearDeltaLake makes it easy to query the table with a simple `dotnet add package` command - no need to install Java or Spark.
 
 ## Status
 
@@ -60,3 +60,4 @@ Bookmark, star, start discussions if you are interested in the future of this pr
 - Alternative implementations
   - [delta-net](https://github.com/johnsusi/delta-net)
   - [delta-dotnet](https://github.com/delta-incubator/delta-dotnet)
+- [Chinook database](https://github.com/lerocha/chinook-database) used in generating test delta tables.

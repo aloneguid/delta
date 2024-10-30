@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text.Json;
 using DeltaLake.Log.Actions;
+using DeltaLake.Log.Poco;
 using Parquet;
 using Parquet.Serialization;
 using Stowage;

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
@@ -15,7 +15,7 @@
         <RepositoryUrl>https://github.com/aloneguid/delta-dotnet</RepositoryUrl>
         <PackageTags>delta.io deltalake</PackageTags>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-        <PackageId>DearDeltaLake</PackageId>
+        <PackageId>DeltaIO</PackageId>
 
     </PropertyGroup>
 

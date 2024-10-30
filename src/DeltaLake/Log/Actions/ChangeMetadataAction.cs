@@ -1,4 +1,6 @@
-﻿namespace DeltaLake.Log.Actions {
+﻿using DeltaLake.Log.Poco;
+
+namespace DeltaLake.Log.Actions {
     public class ChangeMetadataAction : Action {
 
         private readonly ChangeMetadataPoco _data;
