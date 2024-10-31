@@ -1,5 +1,5 @@
-﻿namespace DeltaLake.Log.Poco {
-    class MetadataFormatPoco {
+﻿namespace DeltaLake.Log.Actions {
+    public class MetadataFormat {
         /// <summary>
         /// Name of the encoding for files in this table
         /// </summary>

@@ -1,7 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace DeltaLake.Log.Poco {
-    class ChangeMetadataPoco {
+namespace DeltaLake.Log.Actions {
+    public class Metadata : Action {
+
+        public Metadata() : base(ActionType.Metadata) {
+        }
+
         /// <summary>
         /// Unique identifier for this table
         /// </summary>
@@ -24,7 +28,7 @@ namespace DeltaLake.Log.Poco {
         /// Specification of the encoding for the files stored in the table
         /// </summary>
         [JsonPropertyName("format")]
-        public MetadataFormatPoco? Format { get; set; }
+        public MetadataFormat? Format { get; set; }
 
         // todo: schemaString
 

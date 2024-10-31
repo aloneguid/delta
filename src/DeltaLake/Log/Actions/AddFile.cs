@@ -1,28 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace DeltaLake.Log.Poco {
-    class AddFilePoco {
-        /// <summary>
-        /// Required.
-        /// A relative path to a data file from the root of the table or an absolute path to a file that should be added to the table.
-        /// The path is a URI as specified by RFC 2396 URI Generic Syntax, which needs to be decoded to get the data file path.
-        /// </summary>
-        [JsonPropertyName("path")]
-        public string? Path { get; set; }
+namespace DeltaLake.Log.Actions {
+    public class AddFile : FileBase {
 
-        /// <summary>
-        /// Required.
-        /// A map from partition column to value for this logical file. See also Partition Value Serialization.
-        /// </summary>
-        [JsonPropertyName("partitionValues")]
-        public Dictionary<string, string>? PartitionValues { get; set; }
-
-        /// <summary>
-        /// Required.
-        /// The size of this data file in bytes.
-        /// </summary>
-        [JsonPropertyName("size")]
-        public long? Size { get; set; }
+        public AddFile() : base(ActionType.AddFile) { 
+        }
 
         /// <summary>
         /// Required.
@@ -68,5 +50,12 @@ namespace DeltaLake.Log.Poco {
         /// </summary>
         [JsonPropertyName("clusteringProvider")]
         public string? ClusteringProvider { get; set; }
+
+        [JsonIgnore]
+        public override long? Timestamp => ModificationTime;
+
+        public override void Validate() {
+            if(Path == null) throw new ArgumentNullException(nameof(Path));
+        }
     }
 }

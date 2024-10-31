@@ -5,8 +5,8 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace DeltaLake.Log.Poco {
-     class TransactionIdentifiersPoco {
+namespace DeltaLake.Log.Actions {
+     class TransactionIdentifiers {
 
         /// <summary>
         /// A unique identifier for the application performing the transaction

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.Json;
 using DeltaLake.Log.Actions;
-using DeltaLake.Log.Poco;
+using DeltaLake.Log.Actions;
 using Parquet;
 using Parquet.Serialization;
 using Stowage;
@@ -24,7 +24,7 @@ namespace DeltaLake.Log {
     /// </summary>
     public class DeltaLog {
 
-        const string DeltaLogDirName = "_delta_log/";
+        const string DeltaLogDirName = "_delta_log";
         const string LastCheckpointFileName = "_last_checkpoint";
 
         private readonly IFileStorage _storage;
@@ -53,7 +53,7 @@ namespace DeltaLake.Log {
         private async Task<IReadOnlyCollection<IOEntry>> ListLogEntries(bool compact = true) {
             // Delta log files are stored as JSON in a directory at the root of the table named _delta_log,
             // and together with checkpoints make up the log of all changes that have occurred to a table.
-            IReadOnlyCollection<IOEntry> logEntries = await _storage.Ls(_location.Combine(DeltaLogDirName));
+            IReadOnlyCollection<IOEntry> logEntries = await _storage.Ls(_location.Combine(DeltaLogDirName) + "/");
             logEntries = logEntries
                 .Where(e => !IgnoreFile(e))
                 .OrderBy(e => e.Name)
@@ -78,7 +78,6 @@ namespace DeltaLake.Log {
 
         private async Task<LogCommit> ReadJsonAsCommit(IOEntry entry) {
             var commit = new LogCommit(entry);
-
             string? content = await _storage.ReadText(entry.Path);
             if(content == null)
                 throw new InvalidOperationException();
@@ -86,10 +85,14 @@ namespace DeltaLake.Log {
                 string jsonLine = jsonLineRaw.Trim();
                 if(string.IsNullOrEmpty(jsonLine))
                     continue;
-                Dictionary<string, object?>? uDoc = JsonSerializer.Deserialize<Dictionary<string, object?>>(jsonLine);
-                if(uDoc == null || uDoc.Count != 1 || uDoc.Values.First() is not JsonElement je)
+
+                CommitLine? cl = JsonSerializer.Deserialize<CommitLine>(jsonLine);
+
+                if(cl == null)
                     throw new ApplicationException("unparseable action: " + jsonLine);
-                commit.Actions.Add(Action.CreateFromJsonObject(uDoc.Keys.First(), je));
+
+                commit.Actions.Add(cl.ToAction());
+
             }
             return commit;
         }
@@ -109,21 +112,11 @@ namespace DeltaLake.Log {
             }
 
             // read parquet file
-            IList<CheckpointPoco> commits = await ParquetSerializer.DeserializeAsync<CheckpointPoco>(src);
+            IList<CommitLine> commits = await ParquetSerializer.DeserializeAsync<CommitLine>(src);
 
             var commit = new LogCommit(entry);
-            foreach(CheckpointPoco cp in commits) {
-
-                if(cp.Add != null)
-                    commit.Actions.Add(new AddFileAction(cp.Add));
-                else if(cp.Remove != null)
-                    commit.Actions.Add(new RemoveFileAction(cp.Remove));
-                else if(cp.MetaData != null)
-                    commit.Actions.Add(new ChangeMetadataAction(cp.MetaData));
-                else if(cp.Protocol != null)
-                    commit.Actions.Add(new ProtocolEvolutionAction(cp.Protocol));
-                else
-                    throw new NotImplementedException($"unknown action");
+            foreach(CommitLine cl in commits) {
+                commit.Actions.Add(cl.ToAction());
             }
 
             result.Add(commit);

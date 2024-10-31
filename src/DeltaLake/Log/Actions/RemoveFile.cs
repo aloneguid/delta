@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
-namespace DeltaLake.Log.Poco {
-    class RemoveFilePoco {
-        /// <summary>
-        /// A relative path to a data file from the root of the table or an absolute path to a file that should be added to the table.
-        /// The path is a URI as specified by RFC 2396 URI Generic Syntax, which needs to be decoded to get the data file path.
-        /// </summary>
-        [JsonPropertyName("path")]
-        public string? Path { get; set; }
+namespace DeltaLake.Log.Actions {
+    public class RemoveFile : FileBase {
+
+        public RemoveFile() : base(ActionType.RemoveFile) {
+        }
 
         /// <summary>
         /// The time the deletion occurred, represented as milliseconds since the epoch.
@@ -39,12 +31,6 @@ namespace DeltaLake.Log.Poco {
         [JsonPropertyName("partitionValues")]
         public Dictionary<string, string>? PartitionValues { get; set; }
 
-        /// <summary>
-        /// The size of this data file in bytes.
-        /// </summary>
-        [JsonPropertyName("size")]
-        public long? Size { get; set; }
-
         // todo: stats
 
         /// <summary>
@@ -68,5 +54,8 @@ namespace DeltaLake.Log.Poco {
         /// </summary>
         [JsonPropertyName("defaultRowCommitVersion")]
         public long? DefaultRowCommitVersion { get; set; }
+
+        [JsonIgnore]
+        public override long? Timestamp => DeletionTimestamp;
     }
 }

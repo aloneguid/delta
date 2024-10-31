@@ -1,5 +1,5 @@
 ﻿namespace DeltaLake.Log.Actions {
-    public enum DeltaAction {
+    public enum ActionType {
         /// <summary>
         /// Commit Provenance Information: https://github.com/delta-io/delta/blob/master/PROTOCOL.md#commit-provenance-information
         /// </summary>

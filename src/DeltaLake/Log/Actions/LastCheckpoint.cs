@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace DeltaLake.Log.Poco {
+namespace DeltaLake.Log.Actions {
 
     /// <summary>
     /// A checkpoint contains the complete replay of all actions, up to and including the checkpointed table version,
@@ -14,7 +14,7 @@ namespace DeltaLake.Log.Poco {
     /// See https://github.com/delta-io/delta/blob/master/PROTOCOL.md#checkpoints
     /// last checkpoint file schema: https://github.com/delta-io/delta/blob/master/PROTOCOL.md#last-checkpoint-file-schema
     /// </summary>
-    class LastCheckpointPoco {
+    class LastCheckpoint {
         [JsonPropertyName("version")]
         public long Version { get; set; }
 

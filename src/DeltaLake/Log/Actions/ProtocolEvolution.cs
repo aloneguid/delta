@@ -1,7 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace DeltaLake.Log.Poco {
-    class ProtocolEvolutionActionPoco {
+namespace DeltaLake.Log.Actions {
+    public class ProtocolEvolution : Action {
+
+        public ProtocolEvolution() : base(ActionType.Protocol) {
+        }
+
         /// <summary>
         /// The minimum version of the Delta read protocol that a client must implement in order to correctly read this table
         /// </summary>
