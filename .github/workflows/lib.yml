@@ -1,28 +1,27 @@
-﻿name: 'Build'
+﻿name: 'Library'
 
 env:
   VERSION: 0.0.0
-  PACKAGE_SUFFIX: '-pre.4'
-  # PACKAGE_SUFFIX: ''
+  VERSION_SUFFIX: '-pre.4'
+  # VERSION_SUFFIX: ''
   ASM_VERSION: 0.0.0
 
 on:
   push:
-    branches: [ master ]
+    branches:
+    - master
 
   pull_request:
-    branches: [ master ]
+    branches:
+    - master
 
   workflow_dispatch:
 
 jobs:
+
   test:
+    runs-on: ubuntu-latest
     name: Unit Tests
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-      fail-fast: false
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -31,16 +30,13 @@ jobs:
         dotnet-version: |
           6.0.x
           8.0.x
-
-    - name: 'test on ${{ matrix.os }}'
+    - name: run tests
       run: dotnet test src/DeltaLake.sln -c release
 
 
   build:
-
     runs-on: 'ubuntu-latest'
     name: 'Build NuGet'
-
     steps:
     - run: |
         echo head_ref: ${{ github.head_ref }}
@@ -57,7 +53,7 @@ jobs:
       run: |
         envsubst < src/DeltaLake/Globals.cs > g.tmp && mv g.tmp src/DeltaLake/Globals.cs
         cat src/DeltaLake/Globals.cs
-        dotnet build src/DeltaLake.sln -c release /p:Version=${{ env.VERSION }}${{ env.PACKAGE_SUFFIX }} /p:FileVersion=$VERSION /p:AssemblyVersion=$ASM_VERSION
+        dotnet build src/DeltaLake.sln -c release /p:Version=${{ env.VERSION }}${{ env.VERSION_SUFFIX }} /p:FileVersion=$VERSION /p:AssemblyVersion=$ASM_VERSION
 
     - name: collect artifacts
       run: |
@@ -66,8 +62,16 @@ jobs:
         echo "${{ env.VERSION }}" >> artifacts/version.txt
         cp docs/release-history.md artifacts/
 
-    - uses: actions/upload-artifact@v4
-      name: upload artifacts
+    - name: collect artifacts
+      run: |
+        mkdir -p artifacts
+        cp src/DeltaLake/bin/Release/*.nupkg artifacts/
+        echo "${{ env.VERSION }}" >> artifacts/version.txt
+        cp docs/release-history.md artifacts/
+        grep -m 2 -B 1000 '^## ' artifacts/release-history.md | tail -n +3 | head -n -2 > artifacts/release-notes.md
+        cat artifacts/release-notes.md
+    - name: upload artifacts
+      uses: actions/upload-artifact@v4
       with:
         name: bin
         path: artifacts/*

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Stowage;
 
 namespace DeltaLake {
@@ -35,17 +31,8 @@ namespace DeltaLake {
             return Path.Equals(other.Path);
         }
 
-        private string PartitionValuesToString() {
-            if(!IsPartitioned)
-                return string.Empty;
+        private string PartitionValuesToString() => string.Join('|', PartitionValues.Select((k, v) => $"{k}={v}"));
 
-            var sb = new StringBuilder();
-            foreach((string key, string value) in PartitionValues) {
-                sb.Append($" |{key}={value}");
-            }
-            return sb.ToString();
-        }
-
-        public override string ToString() => $"{Path}   {Size.ToFileSizeUiString()} {PartitionValuesToString()}";
+        public override string ToString() => $"{Path} ({Size.ToFileSizeUiString()}){PartitionValuesToString()}";
     }
 }

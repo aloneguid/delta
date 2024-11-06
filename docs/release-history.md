@@ -1,3 +1,4 @@
 ## 0.0.0
 
-todo
+- Read delta log for a simple table.
+- Read partitioned table.
