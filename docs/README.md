@@ -29,21 +29,23 @@ Delta tables also support versioning, because files are kept for reasons of time
 
 ## Status
 
-Still early stages.
-
-This library can already read and parse delta log for simple unpartitioned tables, but it's still a way to go.
-
-The aim of the first version is to fully support reading the lake, with next version to support modification operations as well.
+This library is almost at the stage where it can read delta tables. The aim of the first version is to fully support reading the lake, with next version to support modification operations as well. You can already use it for non-critical workloads today.
 
 ## Quick start
 
-After installing the nuget package [![NuGet Version](https://img.shields.io/nuget/vpre/DeltaIO?style=flat-square)](https://www.nuget.org/packages/DeltaIO), find out type of storage your tables are stored in. We will stick with local disk here, but there are plenty of other options.
+After installing the nuget package [![NuGet Version](https://img.shields.io/nuget/vpre/DeltaIO?style=flat-square)](https://www.nuget.org/packages/DeltaIO), find out type of storage your tables are stored in. We will stick with local disk here, but there are plenty of other options. This library relies on [Stowage](https://github.com/aloneguid/stowage) library to abstract the locations of source files. Let's say I have three delta tables in `D:\delta-dotnet\src\DeltaLake.Test\data\chinook` folder, which looks like this:
+
+![image-20241108104429788](delta-read-folder.png)
 
 ```csharp
 using DeltaLake;
+using Stowage;
 
-// open table from the local disk
-Table table = new Table("c:/table/folder");
+// point to location where delta table root is stored
+IFileStorage location = Files.Of.LocalDiskStorage("D:\delta-dotnet\src\DeltaLake.Test\data\chinook");
+
+// open "artist.simple" table
+Table table = new Table(location, "artist.simple");
 ```
 
 This will instantiate an interface to the delta table, so you can start performing other operations.
@@ -53,10 +55,20 @@ This will instantiate an interface to the delta table, so you can start performi
 To figure out which files are valid for current delta table, call the following method:
 
 ```csharp
-IReadOnlyCollection<string> files = await table.GetFilesAsync();
+IReadOnlyCollection<DataFile> dataFiles = await table.GetDataFilesAsync();
 ```
 
-This returns the list of files at the *latest* version of this table, which are a *relative path* from the root of the delta table.
+This returns the list of files at the *latest* version of this table. Each `DataFile` contains basic metadata about those data files, including it's size in bytes, partitions and their values, creation timestamp and, most importantly, path to the actual data in parquet format.
+
+You can choose which files to read, and do the following:
+
+```csharp
+// let's open the first data file
+using Stream parquetStream =
+    await table.OpenSeekableStreamAsync(dataFiles.First());
+```
+
+Then read file data in any way you would normally do with [Parquet.Net](https://github.com/aloneguid/parquet-dotnet) library.
 
 ## Appending
 

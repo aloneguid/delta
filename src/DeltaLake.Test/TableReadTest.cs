@@ -4,6 +4,13 @@ using Stowage;
 using Xunit;
 
 namespace DeltaLake.Test {
+
+    public class Artist {
+        public int? ArtistId { get; set; }
+
+        public string? Name { get; set; }
+    }
+
     public class TableReadTest {
         private readonly IFileStorage _storage;
 
@@ -21,9 +28,9 @@ namespace DeltaLake.Test {
 
             using Stream parquetStream = await table.OpenSeekableStreamAsync(dataFiles.First());
 
-            ParquetSerializer.UntypedResult ur = await ParquetSerializer.DeserializeAsync(parquetStream);
+            IList<Artist> artists = await ParquetSerializer.DeserializeAsync<Artist>(parquetStream);
 
-            Assert.Equivalent(new ParquetSchema(), ur.Schema);
+            Assert.Equal(275, artists.Count);
         }
     }
 }

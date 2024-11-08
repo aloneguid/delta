@@ -1,8 +1,8 @@
 ﻿name: 'Library'
 
 env:
-  VERSION: 0.0.0
-  VERSION_SUFFIX: '-pre.6'
+  VERSION: 1.0.0
+  VERSION_SUFFIX: '-alpha.1'
   # VERSION_SUFFIX: ''
   ASM_VERSION: 0.0.0
 
