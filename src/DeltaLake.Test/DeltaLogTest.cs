@@ -53,7 +53,7 @@ namespace DeltaLake.Test {
             IReadOnlyCollection<DataFile> files = await table.GetDataFilesAsync();
             Assert.Single(files);
             Assert.Equal([
-                "part-00000-df960eb7-f439-480a-b59b-c145d2da0a1d-c000.snappy.parquet"],
+                "/chinook/artist.simple/part-00000-df960eb7-f439-480a-b59b-c145d2da0a1d-c000.snappy.parquet"],
                 files.Select(f => f.Path).Order().ToList());
         }
 

@@ -5,7 +5,6 @@ VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{058C833B-4A48-4EF8-AF50-A8D2C777B216}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\prerelease.yml = ..\.github\workflows\prerelease.yml
 		..\.github\workflows\lib.yml = ..\.github\workflows\lib.yml
 		..\docs\README.md = ..\docs\README.md
 		..\docs\release-history.md = ..\docs\release-history.md

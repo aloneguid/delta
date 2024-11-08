@@ -1,4 +1,3 @@
-## 0.0.0
+## 1.0.0
 
-- Read delta log for a simple table.
-- Read partitioned table.
+This is the first public version of the DeltaIO library. The aim of this release was to support the basic read operation on the delta table, it's latest version only, with support for partitioning.
