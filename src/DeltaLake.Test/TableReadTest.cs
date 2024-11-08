@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Parquet.Schema;
+using Parquet.Serialization;
 using Stowage;
 using Xunit;
 
@@ -21,6 +18,12 @@ namespace DeltaLake.Test {
             IReadOnlyCollection<DataFile> dataFiles = await table.GetDataFilesAsync();
 
             Assert.Single(dataFiles);
+
+            using Stream parquetStream = await table.OpenSeekableStreamAsync(dataFiles.First());
+
+            ParquetSerializer.UntypedResult ur = await ParquetSerializer.DeserializeAsync(parquetStream);
+
+            Assert.Equivalent(new ParquetSchema(), ur.Schema);
         }
     }
 }

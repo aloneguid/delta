@@ -1,23 +1,9 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 using DeltaLake.Log.Actions;
-using DeltaLake.Log.Actions;
-using Parquet;
 using Parquet.Serialization;
 using Stowage;
-using Action = DeltaLake.Log.Actions.Action;
 
 namespace DeltaLake.Log {
-
-    public class LogCommit {
-        public LogCommit(IOEntry file) {
-            File = file;
-        }
-
-        public IOEntry File { get; }
-
-        public List<Action> Actions { get; } = new List<Action>();
-    }
 
     /// <summary>
     /// Implements delta log protocol as per https://github.com/delta-io/delta/blob/master/PROTOCOL.md#delta-log-entries

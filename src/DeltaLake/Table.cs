@@ -11,11 +11,13 @@ using Stowage;
 namespace DeltaLake {
     public class Table {
         private readonly IFileStorage _storage;
+        private readonly ICachedStorage _fileStorage;
         private readonly IOPath _location;
         private IReadOnlyCollection<LogCommit>? _history;
 
         public Table(IFileStorage storage, IOPath location) {
             _storage = storage;
+            _fileStorage = Files.Of.MemoryCacheStorage(storage, location.ToString());
             _location = location;
             Log = new DeltaLog(storage, location);
         }
@@ -62,7 +64,9 @@ namespace DeltaLake {
 
                         var fb = (FileBase)action;
                         fb.Validate();
-                        var adf = new DataFile(fb.Path!,
+
+                        var fullPath = new IOPath(_location, fb.Path!);
+                        var adf = new DataFile(fullPath,
                             fb.Size == null ? 0 : fb.Size.Value,
                             fb.PartitionValues,
                             fb.Timestamp == null ? 0 : fb.Timestamp.Value);
@@ -77,6 +81,14 @@ namespace DeltaLake {
             }
 
             return files;
+        }
+
+        public async Task<Stream> OpenSeekableStreamAsync(DataFile dataFile) {
+            Stream? src = await _fileStorage.OpenRead(dataFile.Path);
+            if(src == null) {
+                throw new FileNotFoundException($"File not found: {dataFile.Path}");
+            }
+            return src;
         }
     }
 }

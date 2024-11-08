@@ -49,7 +49,7 @@
 
     <ItemGroup>
         <PackageReference Include="Parquet.Net" Version="5.0.1" />
-        <PackageReference Include="Stowage" Version="2.0.1" />
+        <PackageReference Include="Stowage" Version="2.1.0-pre.2" />
     </ItemGroup>
 
 

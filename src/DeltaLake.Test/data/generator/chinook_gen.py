@@ -78,13 +78,6 @@ print("done")
 
 #%%
 
-# Track table partitioned by MediaTypeId
-
-track_df.printSchema()
-track_df.groupBy("MediaTypeId").count().show()
-
-#%%
-
 (track_df
  .write
  .partitionBy("MediaTypeId")
