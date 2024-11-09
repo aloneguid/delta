@@ -42,7 +42,7 @@ using DeltaLake;
 using Stowage;
 
 // point to location where delta table root is stored
-IFileStorage location = Files.Of.LocalDiskStorage("D:\delta-dotnet\src\DeltaLake.Test\data\chinook");
+IFileStorage location = Files.Of.LocalDiskStorage("D:/delta-dotnet/src/DeltaLake.Test/data/chinook");
 
 // open "artist.simple" table
 Table table = new Table(location, "artist.simple");

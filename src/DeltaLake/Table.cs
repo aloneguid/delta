@@ -22,6 +22,14 @@ namespace DeltaLake {
             Log = new DeltaLog(storage, location);
         }
 
+        public static async Task<bool> IsDeltaTableAsync(IFileStorage storage, IOPath location) {
+            IOPath logLocation = location.Combine(DeltaLog.DeltaLogDirName);
+
+            IReadOnlyCollection<IOEntry> items = await storage.Ls(logLocation, false);
+
+            return items.Count > 0;
+        }
+
         public DeltaLog Log { get; init; }
 
         private async Task<IReadOnlyCollection<LogCommit>> GetOrFetchHistoryAsync() {

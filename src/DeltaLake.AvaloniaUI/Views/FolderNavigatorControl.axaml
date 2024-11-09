@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DeltaLake.AvaloniaUI.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DeltaLake.AvaloniaUI.FolderNavigatorControl"
+             x:DataType="vm:MainWindowViewModel">
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Orientation="Vertical">
+        <TextBox Text="{Binding FsPath, Mode=OneWay}" IsReadOnly="True" Margin="5"/>
+
+        <!-- mini toolbar -->
+        <StackPanel Orientation="Horizontal">
+            <Button Content="⤴️" Command="{Binding NavigateToParentFolder}" Margin="5"/>
+            <Button Content="🔃" Command="{Binding Refresh}" Margin="5"/>
+        </StackPanel>
+
+        <!-- folder list -->
+        <ItemsControl ItemsSource="{Binding PathEntries}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <HyperlinkButton HorizontalAlignment="Stretch"
+                                     Command="{Binding Activate}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Image Source="/Assets/folder.png" Height="20"/>
+                            <TextBlock Text="{Binding Entry.Name}" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </HyperlinkButton>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </StackPanel>
+
+</UserControl>

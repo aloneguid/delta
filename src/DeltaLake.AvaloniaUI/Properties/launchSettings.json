@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DeltaLake.AvaloniaUI": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\delta-dotnet\\src\\DeltaLake.Test\\"
+    }
+  }
+}

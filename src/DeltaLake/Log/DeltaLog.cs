@@ -10,7 +10,7 @@ namespace DeltaLake.Log {
     /// </summary>
     public class DeltaLog {
 
-        const string DeltaLogDirName = "_delta_log";
+        public const string DeltaLogDirName = "_delta_log";
         const string LastCheckpointFileName = "_last_checkpoint";
 
         private readonly IFileStorage _storage;
