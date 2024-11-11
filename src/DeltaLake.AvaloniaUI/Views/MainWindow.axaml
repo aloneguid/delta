@@ -8,6 +8,9 @@
         x:Class="DeltaLake.AvaloniaUI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/logo.ico"
+        xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        xmlns:actiproImages="using:ActiproSoftware.UI.Avalonia.Images"
         Title="DeltaIO Terminal">
 
     <Design.DataContext>
@@ -16,16 +19,67 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        
-        <vw:FolderNavigatorControl/>
-        
-        <vw:DeltaBrowserControl Grid.Column="1"/>
-        
-    </Grid>
+    <DockPanel>
+        <!-- see https://github.com/Actipro/Avalonia-Controls/blob/4c1d0b69c2fd810b19e02ba92ed5c0078fafce52/Samples/SampleBrowser/SampleBrowser.Common/SampleBrowser/Views/RootView.axaml#L12 -->
+        <actipro:ChromedTitleBar DockPanel.Dock="Top">
+            <actipro:ChromedTitleBar.Resources>
+                <actipro:ComparisonConverter x:Key="RightContentMarginConverter">
+                    <actipro:ComparisonConverter.TrueResult>
+                        <Thickness>0,0,20,0</Thickness>
+                    </actipro:ComparisonConverter.TrueResult>
+                    <actipro:ComparisonConverter.FalseResult>
+                        <Thickness>0,0,0,0</Thickness>
+                    </actipro:ComparisonConverter.FalseResult>
+                </actipro:ComparisonConverter>
+            </actipro:ChromedTitleBar.Resources>
+            <actipro:ChromedTitleBar.LeftContent>
+                <StackPanel Orientation="Horizontal" Margin="8,0,0,0">
+                    <Button x:Name="applicationButton" Margin="0,0,8,0" Command="{Binding ToggleBrowserOpen}"
+                        ContentTemplate="{actipro:GlyphTemplate Menu16}"
+                        Theme="{actipro:ControlTheme TitleBarButton}"
+                        ToolTip.Tip="Toggle Sidebar" />
+
+                    <Image DockPanel.Dock="Left" Width="24" Height="24"
+                           Source="avares://DeltaLake.AvaloniaUI/Assets/logo.ico"
+                           VerticalAlignment="Center" IsHitTestVisible="False">
+                        <Image.Effect>
+                            <DropShadowEffect OffsetX="0" OffsetY="1" BlurRadius="3" Opacity="{DynamicResource {actipro:ThemeResourceKey ShadowOpacity}}" />
+                        </Image.Effect>
+                    </Image>
+
+                    <StackPanel Margin="10,7,0,7" VerticalAlignment="Center">
+                        <TextBlock Text="sub" FontSize="12" TextTrimming="CharacterEllipsis" Opacity="0.85"/>
+                        <TextBlock Margin="0,-2,0,0" Text="title" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+
+                </StackPanel>
+            </actipro:ChromedTitleBar.LeftContent>
+            <actipro:ChromedTitleBar.RightContent>
+                <StackPanel Margin="{Binding $parent[actipro:ChromedTitleBar].HasCaptionButtons, Converter={StaticResource RightContentMarginConverter}}" Orientation="Horizontal">
+                    <Button ContentTemplate="{actipro:GlyphTemplate Help16}"
+                            Theme="{actipro:ControlTheme TitleBarButton}"
+                            ToolTip.Tip="Home" />
+                    <actipro:ToggleThemeButton
+							Theme="{actipro:ControlTheme TitleBarToggleThemeButton}"
+							ToolTip.Tip="Toggle Theme"/>
+                </StackPanel>
+            </actipro:ChromedTitleBar.RightContent>
+
+        </actipro:ChromedTitleBar>
+
+        <!-- client area -->
+        <SplitView IsPaneOpen="{Binding IsBrowserOpen}" DisplayMode="Inline" OpenPaneLength="300">
+            <SplitView.Pane>
+                <vw:FolderNavigatorControl/>
+            </SplitView.Pane>
+            <SplitView.Content>
+                <vw:DeltaBrowserControl IsVisible="{Binding IsDeltaTablePath}"
+                                        Padding="5"/>
+            </SplitView.Content>
+
+        </SplitView>
+
+    </DockPanel>
+
 
 </Window>

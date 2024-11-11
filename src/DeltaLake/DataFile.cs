@@ -1,17 +1,28 @@
 ﻿using System.Text;
+using DeltaLake.Log.Actions;
 using Stowage;
 
 namespace DeltaLake {
     public class DataFile : IEquatable<DataFile> {
-        public DataFile(IOPath path, long size, Dictionary<string, string>? partitionValues, long timestamp) {
-            Path = path;
-            Size = size;
-            if(partitionValues != null) {
-                PartitionValues = partitionValues;
-            }
 
-            Timestamp = timestamp.FromUnixTimeMilliseconds();
+        public DataFile(FileBase fileAction, IOPath fullPath) {
+
+            BaseAction = fileAction;
+
+            if(fileAction.Size == null)
+                throw new ArgumentException("Size is required for DataFile");
+            if(fileAction.Timestamp == null)
+                throw new ArgumentException("Timestamp is required for DataFile");
+
+            Path = fullPath;
+            Size = fileAction.Size.Value;
+            if(fileAction.PartitionValues != null) {
+                PartitionValues = fileAction.PartitionValues;
+            }
+            Timestamp = fileAction.Timestamp.Value.FromUnixTimeMilliseconds();
         }
+
+        internal FileBase BaseAction { get; init; }
 
         public IOPath Path { get; }
 
@@ -30,6 +41,10 @@ namespace DeltaLake {
 
             return Path.Equals(other.Path);
         }
+
+        public override bool Equals(object? obj) => Equals(obj as DataFile);
+
+        public override int GetHashCode() => Path.GetHashCode();
 
         private string PartitionValuesToString() => string.Join('|', PartitionValues.Select((k, v) => $"{k}={v}"));
 

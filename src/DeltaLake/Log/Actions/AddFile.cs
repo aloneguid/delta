@@ -29,7 +29,12 @@ namespace DeltaLake.Log.Actions {
         [JsonPropertyName("tags")]
         public Dictionary<string, string>? Tags { get; set; }
 
-        // todo: deletionVector
+        /// <summary>
+        /// Either null (or absent in JSON) when no DV is associated with this data file, or a struct (described below)
+        /// that contains necessary information about the DV that is part of this logical file.
+        /// </summary>
+        [JsonPropertyName("deletionVector")]
+        public DeletionVector? DeletionVector { get; set; }
 
         /// <summary>
         /// Default generated Row ID of the first row in the file.
@@ -57,5 +62,7 @@ namespace DeltaLake.Log.Actions {
         public override void Validate() {
             if(Path == null) throw new ArgumentNullException(nameof(Path));
         }
+
+        public override string ToString() => $"add {Path}";
     }
 }

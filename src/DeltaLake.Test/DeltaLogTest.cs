@@ -76,6 +76,11 @@ namespace DeltaLake.Test {
             IReadOnlyCollection<DataFile> files = await table.GetDataFilesAsync();
             // there should be exactly 14 files (batches of 20 rows)
             Assert.Equal(14, files.Count);
+
+            // test version numbers
+            IReadOnlyCollection<long> versions = await table.ListVersionsAsync();
+            Assert.Equal(4, versions.Count);
+            Assert.Equal(versions, [10, 11, 12, 13]);
         }
 
         [Fact]

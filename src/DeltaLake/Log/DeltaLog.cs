@@ -5,13 +5,43 @@ using Stowage;
 
 namespace DeltaLake.Log {
 
+    public class LogEntry {
+        public LogEntry(IOEntry commitFile) {
+            Entry = commitFile;
+            Version = ParseVersion(commitFile.Path);
+        }
+
+        public IOEntry Entry { get; }
+
+        public long Version { get; }
+
+        public bool IsJson => Entry.Name.EndsWith(".json");
+
+        public bool IsClassicCheckpoint => Entry.Name.EndsWith(".checkpoint.parquet");
+
+        public bool IsLastCheckpoint => Entry.Name == DeltaLog.LastCheckpointFileName;
+
+        public bool ShouldIgnore => Entry.Name.EndsWith(".crc");
+
+        private static long ParseVersion(IOPath path) {
+            string vs = path.Name;
+            int idx = vs.IndexOf('.');
+            if(idx != -1) {
+                vs = vs.Substring(0, idx);
+            }
+
+            long.TryParse(vs, out long v);
+            return v;
+        }
+    }
+
     /// <summary>
     /// Implements delta log protocol as per https://github.com/delta-io/delta/blob/master/PROTOCOL.md#delta-log-entries
     /// </summary>
     public class DeltaLog {
 
         public const string DeltaLogDirName = "_delta_log";
-        const string LastCheckpointFileName = "_last_checkpoint";
+        public const string LastCheckpointFileName = "_last_checkpoint";
 
         private readonly IFileStorage _storage;
         private readonly IOPath _location;
@@ -23,48 +53,41 @@ namespace DeltaLake.Log {
             _location = location;
         }
 
-        private static bool IsJsonFile(IOEntry entry) => entry.Name.EndsWith(".json");
-
-        private static bool IsClassicCheckpointFile(IOEntry entry) => entry.Name.EndsWith(".checkpoint.parquet");
-
-        private static bool IsLastCheckpointFile(IOEntry entry) => entry.Name == LastCheckpointFileName;
-
-        private static bool IgnoreFile(IOEntry entry) => entry.Name.EndsWith(".crc");
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="compact">When true, the minimum about of files will be returned</param>
         /// <returns></returns>
-        private async Task<IReadOnlyCollection<IOEntry>> ListLogEntries(bool compact = true) {
+        private async Task<IReadOnlyCollection<LogEntry>> ListLogEntries() {
             // Delta log files are stored as JSON in a directory at the root of the table named _delta_log,
             // and together with checkpoints make up the log of all changes that have occurred to a table.
-            IReadOnlyCollection<IOEntry> logEntries = await _storage.Ls(_location.Combine(DeltaLogDirName) + "/");
-            logEntries = logEntries
-                .Where(e => !IgnoreFile(e))
-                .OrderBy(e => e.Name)
+            IReadOnlyCollection<IOEntry> logFiles = await _storage.Ls(_location.Combine(DeltaLogDirName) + "/");
+            var logEntries = logFiles
+                .Select(f => new LogEntry(f))
+                .Where(e => !e.ShouldIgnore)
+                .OrderBy(e => e.Version)
                 .ToList();
-
-            if(compact) {
-                // find max checkpoint
-                int maxCheckpointVersion = logEntries
-                    .Where(IsClassicCheckpointFile)
-                    .Select(e => int.Parse(e.Name.Split('.')[0]))
-                    .DefaultIfEmpty(-1)
-                    .Max();
-
-                // filter out json entries with version less than max checkpoint
-                logEntries = logEntries
-                    .Where(e => !IsJsonFile(e) || int.Parse(e.Name.Split('.')[0]) > maxCheckpointVersion)
-                    .ToList();
-            }
 
             return logEntries;
         }
 
-        private async Task<LogCommit> ReadJsonAsCommit(IOEntry entry) {
+        private static IReadOnlyCollection<LogEntry> CompactLogEntries(IReadOnlyCollection<LogEntry> logEntries) {
+            // find max checkpoint
+            long maxCheckpointVersion = logEntries
+                .Where(e => e.IsClassicCheckpoint)
+                .Select(e => e.Version)
+                .DefaultIfEmpty(-1)
+                .Max();
+
+            // filter out json entries with version less than max checkpoint
+            return logEntries
+                .Where(e => !e.IsJson || e.Version > maxCheckpointVersion)
+                .ToList();
+        }
+
+        private async Task<LogCommit> ReadJsonAsCommit(LogEntry entry) {
             var commit = new LogCommit(entry);
-            string? content = await _storage.ReadText(entry.Path);
+            string? content = await _storage.ReadText(entry.Entry.Path);
             if(content == null)
                 throw new InvalidOperationException();
             foreach(string jsonLineRaw in content.Split('\n')) {
@@ -83,12 +106,12 @@ namespace DeltaLake.Log {
             return commit;
         }
 
-        private async Task<IEnumerable<LogCommit>> ReadParquetAsCommits(IOEntry entry) {
+        private async Task<IEnumerable<LogCommit>> ReadParquetAsCommits(LogEntry entry) {
             var result = new List<LogCommit>();
 
             // read into memory stream (these files should be tiny)
             var src = new MemoryStream();
-            using(Stream? s = await _storage.OpenRead(entry.Path)) {
+            using(Stream? s = await _storage.OpenRead(entry.Entry.Path)) {
                 if(s == null) {
                     throw new InvalidOperationException();
                 }
@@ -112,19 +135,20 @@ namespace DeltaLake.Log {
         public async Task<IReadOnlyCollection<LogCommit>> ReadHistoryAsync() {
 
             var commits = new List<LogCommit>();
-            IReadOnlyCollection<IOEntry> entries = await ListLogEntries(true);
+            IReadOnlyCollection<LogEntry> entries = await ListLogEntries();
+            entries = CompactLogEntries(entries);
 
-            foreach(IOEntry entry in entries) {
+            foreach(LogEntry entry in entries) {
 
-                if(IsJsonFile(entry)) {
+                if(entry.IsJson) {
                     commits.Add(await ReadJsonAsCommit(entry));
-                } else if(IsLastCheckpointFile(entry)) {
+                } else if(entry.IsLastCheckpoint) {
                     // "last checkpoint" file
-                } else if(IsClassicCheckpointFile(entry)) {
+                } else if(entry.IsClassicCheckpoint) {
                     // "classic" checkpoint file
                     commits.AddRange(await ReadParquetAsCommits(entry));
                 } else {
-                    throw new NotImplementedException(entry.Name);
+                    throw new NotImplementedException(entry.ToString());
                 }
             }
 

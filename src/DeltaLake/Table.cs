@@ -9,16 +9,18 @@ using DeltaLake.Log.Actions;
 using Stowage;
 
 namespace DeltaLake {
-    public class Table {
+    public class Table : IDisposable {
         private readonly IFileStorage _storage;
         private readonly ICachedStorage _fileStorage;
         private readonly IOPath _location;
+        private readonly bool _disposeStorage;
         private IReadOnlyCollection<LogCommit>? _history;
 
-        public Table(IFileStorage storage, IOPath location) {
+        public Table(IFileStorage storage, IOPath location, bool disposeStorage = false) {
             _storage = storage;
             _fileStorage = Files.Of.MemoryCacheStorage(storage, location.ToString());
             _location = location;
+            _disposeStorage = disposeStorage;
             Log = new DeltaLog(storage, location);
         }
 
@@ -56,6 +58,23 @@ namespace DeltaLake {
         }
 
         /// <summary>
+        /// Lists table versions in increasing order.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IReadOnlyCollection<long>> ListVersionsAsync() {
+            IReadOnlyCollection<LogCommit> history = await GetOrFetchHistoryAsync();
+            return history.Select(c => c.Version).ToList();
+        }
+
+        /// <summary>
+        /// Gets current table version
+        /// </summary>
+        /// <returns></returns>
+        public async Task<long> GetVersionAsync() {
+            return (await GetOrFetchHistoryAsync()).Last().Version;
+        }
+
+        /// <summary>
         /// Determines the list of active data files in the table at the given version.
         /// </summary>
         /// <returns></returns>
@@ -74,15 +93,12 @@ namespace DeltaLake {
                         fb.Validate();
 
                         var fullPath = new IOPath(_location, fb.Path!);
-                        var adf = new DataFile(fullPath,
-                            fb.Size == null ? 0 : fb.Size.Value,
-                            fb.PartitionValues,
-                            fb.Timestamp == null ? 0 : fb.Timestamp.Value);
+                        DataFile dataFile = new DataFile(fb, fullPath);
 
                         if(isAdd) {
-                            files.Add(adf);
+                            files.Add(dataFile);
                         } else {
-                            files.Remove(adf);
+                            files.Remove(dataFile);
                         }
                     }
                 }
@@ -97,6 +113,12 @@ namespace DeltaLake {
                 throw new FileNotFoundException($"File not found: {dataFile.Path}");
             }
             return src;
+        }
+
+        public void Dispose() {
+            if(_disposeStorage) {
+                _storage.Dispose();
+            }
         }
     }
 }

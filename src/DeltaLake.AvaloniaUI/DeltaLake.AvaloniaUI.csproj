@@ -1,44 +1,49 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-    <AvaloniaResource Include="Assets\**" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Models\" />
+        <AvaloniaResource Include="Assets\**" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Assets\logo-128x128.png" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="Assets\logo-128x128.png" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\NetBox.cs" Link="NetBox.cs" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\NetBox.cs" Link="NetBox.cs" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Assets\logo.ico" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.0" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.0" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.0" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="Assets\logo.ico" />
+    </ItemGroup>
 
 
-  <ItemGroup>
-    <ProjectReference Include="..\DeltaLake\DeltaLake.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.2.0" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.0" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.0" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.0" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia" Version="24.2.0" />
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia.Themes.DataGrid" Version="24.2.0" />
+        <PackageReference Include="Projektanker.Icons.Avalonia" Version="9.4.1" />
+        <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.4.1" />
+
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\DeltaLake\DeltaLake.csproj" />
+    </ItemGroup>
 </Project>

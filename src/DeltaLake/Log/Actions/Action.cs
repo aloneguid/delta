@@ -32,7 +32,7 @@ namespace DeltaLake.Log.Actions {
             throw new NotSupportedException($"action '{name}' is not supported");
         }
 
-        public override string ToString() => DeltaAction.ToString();
+        public override string ToString() => DeltaAction.ToString().ToLower();
 
         public virtual void Validate() {
             

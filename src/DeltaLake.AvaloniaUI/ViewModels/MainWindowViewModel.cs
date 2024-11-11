@@ -33,6 +33,9 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
         private string? _implRoot;
 
         [ObservableProperty]
+        private bool _isBrowserOpen = true;
+
+        [ObservableProperty]
         private IOPath _fsPath = IOPath.Root;
 
         [ObservableProperty]
@@ -45,7 +48,22 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
         private Table? _deltaTable;
 
         [ObservableProperty]
+        private long _selectedDeltaVersion;
+
+        [ObservableProperty]
+        private ObservableCollection<long>? _deltaVersions;
+
+        [ObservableProperty]
         private ObservableCollection<LogCommit>? _deltaHistory;
+
+        [ObservableProperty]
+        private LogCommit? _selectedLogCommit;
+
+        [ObservableProperty]
+        private ObservableCollection<DataFile>? _dataFiles;
+
+        [ObservableProperty]
+        private DataFile? _selectedDataFile;
 
         public MainWindowViewModel() {
             _fs = CreateFileStorage(out string implRoot);
@@ -76,10 +94,22 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
 
             if(IsDeltaTablePath) {
                 DeltaTable = new Table(_fs, FsPath);
+                DeltaVersions = new ObservableCollection<long>((await DeltaTable.ListVersionsAsync()).OrderDescending());
+                SelectedDeltaVersion = DeltaVersions.First();
+                DataFiles = new ObservableCollection<DataFile>(await DeltaTable.GetDataFilesAsync());
+                SelectedDataFile = DataFiles.FirstOrDefault();
+
                 DeltaHistory = new ObservableCollection<LogCommit>(await DeltaTable.Log.ReadHistoryAsync());
+                SelectedLogCommit = DeltaHistory.FirstOrDefault();
             } else {
                 DeltaTable = null;
+                DeltaVersions = null;
+                SelectedDeltaVersion = 0;
+                DataFiles = null;
+                SelectedDataFile = null;
+
                 DeltaHistory = null;
+                SelectedLogCommit = null;
             }
         }
 
@@ -95,6 +125,10 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
         public void NavigateToParentFolder() {
             FsPath = FsPath.Parent;
             Refresh();
+        }
+
+        public void ToggleBrowserOpen() {
+            IsBrowserOpen = !IsBrowserOpen;
         }
 
         /// <summary>

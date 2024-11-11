@@ -57,5 +57,7 @@ namespace DeltaLake.Log.Actions {
 
         [JsonIgnore]
         public override long? Timestamp => DeletionTimestamp;
+
+        public override string ToString() => $"remove {Path}";
     }
 }

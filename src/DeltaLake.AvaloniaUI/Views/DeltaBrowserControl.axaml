@@ -12,17 +12,76 @@
 
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
-            <Image Source="/Assets/delta.png" Height="30" IsVisible="{Binding IsDeltaTablePath}"/>
+            <Image Source="/Assets/delta.png" Height="15"/>
+            <TextBlock Text="version" Padding="5,0,0,0" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding DeltaVersions}"
+                      SelectedItem="{Binding SelectedDeltaVersion}"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <ListBox ItemsSource="{Binding DeltaHistory}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding File.Name}"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </StackPanel>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Vertical" Grid.Column="0">
+                <TextBlock Text="Data files"/>
+                <ListBox ItemsSource="{Binding DataFiles}"
+                            SelectedItem="{Binding SelectedDataFile}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path}" Padding="0" Margin="0"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="2"/>
+                        </Style>
+                    </ListBox.Styles>
+                </ListBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" Grid.Column="2">
+                <TextBlock Text="Log commits"/>
+                <ListBox ItemsSource="{Binding DeltaHistory}"
+                            SelectedItem="{Binding SelectedLogCommit}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding File.Name}" Padding="0" Margin="0"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="2"/>
+                        </Style>
+                    </ListBox.Styles>
+                </ListBox>
+            </StackPanel>
+
+
+
+
+            <StackPanel Orientation="Vertical" Grid.Column="4">
+                <TextBlock Text="Actions"/>
+                <ListBox ItemsSource="{Binding SelectedLogCommit.Actions}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" Padding="0" Margin="0"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="2"/>
+                        </Style>
+                    </ListBox.Styles>
+
+                </ListBox>
+            </StackPanel>
+
+        </Grid>
     </StackPanel>
 
 
