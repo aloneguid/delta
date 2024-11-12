@@ -9,82 +9,74 @@ using DeltaLake.Log.Actions;
 using Stowage;
 
 namespace DeltaLake {
-    public class Table : IDisposable {
+    public class Table : IAsyncDisposable {
         private readonly IFileStorage _storage;
         private readonly ICachedStorage _fileStorage;
         private readonly IOPath _location;
         private readonly bool _disposeStorage;
-        private IReadOnlyCollection<LogCommit>? _history;
+        private readonly List<DataFile> _dataFiles = new();
 
-        public Table(IFileStorage storage, IOPath location, bool disposeStorage = false) {
+        private Table(IFileStorage storage, IOPath location,
+            DeltaLog log, IReadOnlyCollection<LogCommit> history,
+            bool disposeStorage = false) {
             _storage = storage;
             _fileStorage = Files.Of.MemoryCacheStorage(storage, location.ToString());
             _location = location;
             _disposeStorage = disposeStorage;
-            Log = new DeltaLog(storage, location);
+            Log = log;
+            History = history;
+            Metadata = FindMetadata();
+
+            FindDataFiles();
         }
 
-        public static async Task<bool> IsDeltaTableAsync(IFileStorage storage, IOPath location) {
-            IOPath logLocation = location.Combine(DeltaLog.DeltaLogDirName);
+        /// <summary>
+        /// Opens an existing Delta Lake table
+        /// </summary>
+        /// <param name="storage"></param>
+        /// <param name="location"></param>
+        /// <param name="disposeStorage"></param>
+        /// <returns></returns>
+        public static async Task<Table> OpenAsync(IFileStorage storage, IOPath location, bool disposeStorage = false) {
 
-            IReadOnlyCollection<IOEntry> items = await storage.Ls(logLocation, false);
-
-            return items.Count > 0;
+            var log = new DeltaLog(storage, location);
+            IReadOnlyCollection<LogCommit> history = await log.ReadHistoryAsync();
+            return new Table(storage, location, log, history, disposeStorage);
         }
+
+        /// <summary>
+        /// Table commit history
+        /// </summary>
+        public IReadOnlyCollection<LogCommit> History { get; private set; }
+
+        /// <summary>
+        /// List of table versions in increasing order.
+        /// </summary>
+        public IReadOnlyCollection<long> Versions => History.Select(c => c.Version).ToList();
+
+        /// <summary>
+        /// Current table version
+        /// </summary>
+        public long CurrentVersion => History.Last().Version;
 
         public DeltaLog Log { get; init; }
 
-        private async Task<IReadOnlyCollection<LogCommit>> GetOrFetchHistoryAsync() {
-            if(_history == null) {
-                _history = await Log.ReadHistoryAsync();
-            }
-
-            return _history;
-        }
+        public Metadata Metadata { get; init; }
 
         /// <summary>
-        /// Opens delta table from disk at given location.
+        /// List of data files in the active version of this table
         /// </summary>
-        /// <param name="directoryPath"></param>
-        /// <returns></returns>
-        public static Table OpenFromDisk(string directoryPath) {
-            if(!Directory.Exists(directoryPath)) {
-                throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");
-            }
-
-            var di = new DirectoryInfo(directoryPath);
-            IFileStorage storage = Files.Of.LocalDisk(di.Parent!.FullName);
-            return new Table(storage, new IOPath(di.Name));
-        }
-
-        /// <summary>
-        /// Lists table versions in increasing order.
-        /// </summary>
-        /// <returns></returns>
-        public async Task<IReadOnlyCollection<long>> ListVersionsAsync() {
-            IReadOnlyCollection<LogCommit> history = await GetOrFetchHistoryAsync();
-            return history.Select(c => c.Version).ToList();
-        }
-
-        /// <summary>
-        /// Gets current table version
-        /// </summary>
-        /// <returns></returns>
-        public async Task<long> GetVersionAsync() {
-            return (await GetOrFetchHistoryAsync()).Last().Version;
-        }
+        public IReadOnlyCollection<DataFile> DataFiles => _dataFiles;
 
         /// <summary>
         /// Determines the list of active data files in the table at the given version.
         /// </summary>
         /// <returns></returns>
-        public async Task<IReadOnlyCollection<DataFile>> GetDataFilesAsync() {
-
-            IReadOnlyCollection<LogCommit> history = await GetOrFetchHistoryAsync();
+        private void FindDataFiles() {
 
             var files = new HashSet<DataFile>();
 
-            foreach(LogCommit commit in history) {
+            foreach(LogCommit commit in History) {
                 foreach(Log.Actions.Action action in commit.Actions) {
                     if(action.DeltaAction == ActionType.AddFile || action.DeltaAction == ActionType.RemoveFile) {
                         bool isAdd = action.DeltaAction == ActionType.AddFile;
@@ -104,7 +96,16 @@ namespace DeltaLake {
                 }
             }
 
-            return files;
+            _dataFiles.Clear();
+            _dataFiles.AddRange(files);
+        }
+
+        private Metadata FindMetadata() {
+            return History
+                .SelectMany(c => c.Actions)
+                .Where(a => a.DeltaAction == ActionType.Metadata)
+                .Cast<Metadata>()
+                .Last();
         }
 
         public async Task<Stream> OpenSeekableStreamAsync(DataFile dataFile) {
@@ -115,10 +116,11 @@ namespace DeltaLake {
             return src;
         }
 
-        public void Dispose() {
+        public ValueTask DisposeAsync() {
             if(_disposeStorage) {
                 _storage.Dispose();
             }
+            return ValueTask.CompletedTask;
         }
     }
 }

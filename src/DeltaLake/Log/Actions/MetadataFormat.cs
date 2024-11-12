@@ -9,5 +9,7 @@
         /// A map containing configuration options for the format
         /// </summary>
         public Dictionary<string, string> Options { get; set; } = new Dictionary<string, string>();
+
+        public override string ToString() => Provider;
     }
 }

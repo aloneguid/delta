@@ -93,13 +93,13 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
             IsDeltaTablePath = PathEntries.Any(e => e.Entry.Name == fn);
 
             if(IsDeltaTablePath) {
-                DeltaTable = new Table(_fs, FsPath);
-                DeltaVersions = new ObservableCollection<long>((await DeltaTable.ListVersionsAsync()).OrderDescending());
+                DeltaTable = await Table.OpenAsync(_fs, FsPath);
+                DeltaVersions = new ObservableCollection<long>(DeltaTable.Versions.OrderDescending());
                 SelectedDeltaVersion = DeltaVersions.First();
-                DataFiles = new ObservableCollection<DataFile>(await DeltaTable.GetDataFilesAsync());
+                DataFiles = new ObservableCollection<DataFile>(DeltaTable.DataFiles);
                 SelectedDataFile = DataFiles.FirstOrDefault();
 
-                DeltaHistory = new ObservableCollection<LogCommit>(await DeltaTable.Log.ReadHistoryAsync());
+                DeltaHistory = new ObservableCollection<LogCommit>(DeltaTable.History);
                 SelectedLogCommit = DeltaHistory.FirstOrDefault();
             } else {
                 DeltaTable = null;

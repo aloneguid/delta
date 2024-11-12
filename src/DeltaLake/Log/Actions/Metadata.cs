@@ -30,7 +30,11 @@ namespace DeltaLake.Log.Actions {
         [JsonPropertyName("format")]
         public MetadataFormat? Format { get; set; }
 
-        // todo: schemaString
+        /// <summary>
+        /// Schema of the table
+        /// </summary>
+        [JsonPropertyName("schemaString")]
+        public string? SchemaString { get; set; }
 
         /// <summary>
         /// An array containing the names of columns by which the data should be partitioned.
@@ -42,7 +46,10 @@ namespace DeltaLake.Log.Actions {
         /// The time when this metadata action is created, in milliseconds since the Unix epoch
         /// </summary>
         [JsonPropertyName("createdTime")]
-        public long? CreatedTime { get; set; }
+        public long? CreatedTimeUnixMilliseconds { get; set; }
+
+        [JsonIgnore]
+        public DateTime CreatedTimeDateTime => CreatedTimeUnixMilliseconds!.Value.FromUnixTimeMilliseconds();
 
         /// <summary>
         /// A map containing configuration options for the metadata action

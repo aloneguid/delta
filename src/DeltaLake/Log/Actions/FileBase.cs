@@ -34,5 +34,15 @@ namespace DeltaLake.Log.Actions {
 
         [JsonIgnore]
         public abstract long? Timestamp { get; }
+
+        /// <summary>
+        /// Either null (or absent in JSON) when no DV is associated with this data file, or a struct (described below)
+        /// that contains necessary information about the DV that is part of this logical file.
+        /// </summary>
+        [JsonPropertyName("deletionVector")]
+        public DeletionVector? DeletionVector { get; set; }
+
+        [JsonPropertyName("stats")]
+        public string? Stats { get; set; }
     }
 }

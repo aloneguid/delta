@@ -30,13 +30,6 @@ namespace DeltaLake.Log.Actions {
         public Dictionary<string, string>? Tags { get; set; }
 
         /// <summary>
-        /// Either null (or absent in JSON) when no DV is associated with this data file, or a struct (described below)
-        /// that contains necessary information about the DV that is part of this logical file.
-        /// </summary>
-        [JsonPropertyName("deletionVector")]
-        public DeletionVector? DeletionVector { get; set; }
-
-        /// <summary>
         /// Default generated Row ID of the first row in the file.
         /// The default generated Row IDs of the other rows in the file can be reconstructed by adding the physical index
         /// of the row within the file to the base Row ID. See also Row IDs.

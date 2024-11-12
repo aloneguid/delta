@@ -20,13 +20,11 @@ namespace DeltaLake.Test {
 
         [Fact]
         public async Task ArtistSimple() {
-            Table table = new Table(_storage, new IOPath("chinook", "artist.simple"));
+            Table table = await Table.OpenAsync(_storage, new IOPath("chinook", "artist.simple"));
 
-            IReadOnlyCollection<DataFile> dataFiles = await table.GetDataFilesAsync();
+            Assert.Single(table.DataFiles);
 
-            Assert.Single(dataFiles);
-
-            using Stream parquetStream = await table.OpenSeekableStreamAsync(dataFiles.First());
+            using Stream parquetStream = await table.OpenSeekableStreamAsync(table.DataFiles.First());
 
             IList<Artist> artists = await ParquetSerializer.DeserializeAsync<Artist>(parquetStream);
 

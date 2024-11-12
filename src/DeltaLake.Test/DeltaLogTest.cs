@@ -22,14 +22,12 @@ namespace DeltaLake.Test {
         /// <returns></returns>
         [Fact]
         public async Task ArtistSimple() {
-            Table table = new Table(_storage, new IOPath("chinook", "artist.simple"));
-
-            IReadOnlyCollection<LogCommit> commits = await table.Log.ReadHistoryAsync();
+            Table table = await Table.OpenAsync(_storage, new IOPath("chinook", "artist.simple"));
 
             // should be only a single commit
-            Assert.Single(commits);
+            Assert.Single(table.History);
 
-            List<A.Action> actions = commits.First().Actions;
+            List<A.Action> actions = table.History.First().Actions;
             // 0
             var a0 = (A.CommitInfo)actions[0];
             Assert.Equal(ActionType.CommitInfo, a0.DeltaAction);
@@ -50,11 +48,10 @@ namespace DeltaLake.Test {
 
             // file set
 
-            IReadOnlyCollection<DataFile> files = await table.GetDataFilesAsync();
-            Assert.Single(files);
+            Assert.Single(table.DataFiles);
             Assert.Equal([
                 "/chinook/artist.simple/part-00000-df960eb7-f439-480a-b59b-c145d2da0a1d-c000.snappy.parquet"],
-                files.Select(f => f.Path).Order().ToList());
+                table.DataFiles.Select(f => f.Path).Order().ToList());
         }
 
         /// <summary>
@@ -64,41 +61,33 @@ namespace DeltaLake.Test {
         /// <returns></returns>
         [Fact]
         public async Task ArtistTrickle() {
-            Table table = new Table(_storage, new IOPath("chinook", "artist.trickle"));
-
-            IReadOnlyCollection<LogCommit> commits = await table.Log.ReadHistoryAsync();
+            Table table = await Table.OpenAsync(_storage, new IOPath("chinook", "artist.trickle"));
 
             // there shoudl be exactly 4 commits (1 checkpointed and 3 json)
-            Assert.Equal(4, commits.Count);
+            Assert.Equal(4, table.History.Count);
 
             // file set
 
-            IReadOnlyCollection<DataFile> files = await table.GetDataFilesAsync();
             // there should be exactly 14 files (batches of 20 rows)
-            Assert.Equal(14, files.Count);
+            Assert.Equal(14, table.DataFiles.Count);
 
             // test version numbers
-            IReadOnlyCollection<long> versions = await table.ListVersionsAsync();
-            Assert.Equal(4, versions.Count);
-            Assert.Equal(versions, [10, 11, 12, 13]);
+            Assert.Equal(4, table.Versions.Count);
+            Assert.Equal(table.Versions, [10, 11, 12, 13]);
         }
 
         [Fact]
         public async Task TrackPartitinedByMediaTypeId() {
-            var table = new Table(_storage, new IOPath("chinook", "track.partitioned.mediatypeid"));
+            Table table = await Table.OpenAsync(_storage, new IOPath("chinook", "track.partitioned.mediatypeid"));
 
-            IReadOnlyCollection<LogCommit> commits = await table.Log.ReadHistoryAsync();
-
-            IReadOnlyCollection<DataFile> files = await table.GetDataFilesAsync();
-
-            Assert.Single(commits);
+            Assert.Single(table.History);
 
             // there should be 1 partition definion and 5 partition values
-            var partitionNames = files.SelectMany(f => f.PartitionValues.Keys).Distinct().ToList();
+            var partitionNames = table.DataFiles.SelectMany(f => f.PartitionValues.Keys).Distinct().ToList();
             Assert.Single(partitionNames);
             Assert.Equal("MediaTypeId", partitionNames[0]);
 
-            var partitionValues = files.SelectMany(f => f.PartitionValues.Values).Distinct().ToList();
+            var partitionValues = table.DataFiles.SelectMany(f => f.PartitionValues.Values).Distinct().ToList();
             Assert.Equal(5, partitionValues.Count);
             Assert.Equal(new[] { "1", "2", "3", "4", "5" }, partitionValues);
         }
