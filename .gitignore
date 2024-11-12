@@ -4,3 +4,4 @@ obj/
 bin/
 *.swp
 *.iml
+launchSettings.json
