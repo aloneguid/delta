@@ -45,17 +45,17 @@ using Stowage;
 IFileStorage location = Files.Of.LocalDiskStorage("D:/delta-dotnet/src/DeltaLake.Test/data/chinook");
 
 // open "artist.simple" table
-Table table = new Table(location, "artist.simple");
+Table table = await Table.OpenAsync(location, "chinook");
 ```
 
 This will instantiate an interface to the delta table, so you can start performing other operations.
 
 ## Reading
 
-To figure out which files are valid for current delta table, call the following method:
+To figure out which files are valid for current delta table, read the `DataFiles` property;
 
 ```csharp
-IReadOnlyCollection<DataFile> dataFiles = await table.GetDataFilesAsync();
+IReadOnlyCollection<DataFile> dataFiles = table.DataFiles;
 ```
 
 This returns the list of files at the *latest* version of this table. Each `DataFile` contains basic metadata about those data files, including it's size in bytes, partitions and their values, creation timestamp and, most importantly, path to the actual data in parquet format.
@@ -68,7 +68,17 @@ using Stream parquetStream =
     await table.OpenSeekableStreamAsync(dataFiles.First());
 ```
 
-Then read file data in any way you would normally do with [Parquet.Net](https://github.com/aloneguid/parquet-dotnet) library.
+Then read file data in any way you would normally do with [Parquet.Net](https://github.com/aloneguid/parquet-dotnet) library, for example deserialise them into `Artist`:
+
+```csharp
+public class Artist {
+    public int? ArtistId { get; set; }
+
+    public string? Name { get; set; }
+}
+
+IList<Artist> artists = await ParquetSerializer.DeserializeAsync<Artist>(parquetStream);
+```
 
 ## Appending
 

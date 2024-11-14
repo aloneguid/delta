@@ -35,8 +35,8 @@
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
-        <PackageReference Include="ActiproSoftware.Controls.Avalonia" Version="24.2.0" />
-        <PackageReference Include="ActiproSoftware.Controls.Avalonia.Themes.DataGrid" Version="24.2.0" />
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia" Version="25.1.0" />
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia.Themes.DataGrid" Version="25.1.0" />
         <PackageReference Include="Projektanker.Icons.Avalonia" Version="9.4.1" />
         <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.4.1" />
 
