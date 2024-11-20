@@ -64,6 +64,16 @@ namespace DeltaLake {
         public Metadata Metadata { get; init; }
 
         /// <summary>
+        /// Returns true if the table is partitioned.
+        /// </summary>
+        public bool IsPartitioned => Metadata.PartitionColumns?.Length > 0;
+
+        /// <summary>
+        /// List of partition columns in the table, or empty if the table is not partitioned.
+        /// </summary>
+        public IReadOnlyCollection<string> PartitionColumns => Metadata.PartitionColumns ?? Array.Empty<string>();
+
+        /// <summary>
         /// List of data files in the active version of this table
         /// </summary>
         public IReadOnlyCollection<DataFile> DataFiles => _dataFiles;
@@ -84,8 +94,7 @@ namespace DeltaLake {
                         var fb = (FileBase)action;
                         fb.Validate();
 
-                        var fullPath = new IOPath(_location, fb.Path!);
-                        DataFile dataFile = new DataFile(fb, fullPath);
+                        DataFile dataFile = new DataFile(fb, _location, new IOPath(fb.Path!));
 
                         if(isAdd) {
                             files.Add(dataFile);

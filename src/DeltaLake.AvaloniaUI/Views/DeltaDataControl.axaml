@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:DeltaLake.AvaloniaUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DeltaLake.AvaloniaUI.DeltaDataControl"
+             x:DataType="vm:DeltaDataViewModel">
+    <Design.DataContext>
+        <vm:DeltaDataViewModel/>
+    </Design.DataContext>
+
+    <Grid>        
+        <DataGrid ItemsSource="{Binding DataFiles}"
+                  Padding="0" Margin="0" BorderThickness="0">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Partitions">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ItemsControl ItemsSource="{Binding DataFile.PartitionValues}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Size" Binding="{Binding SizeDisplay}"/>
+                <DataGridTextColumn Header="Relative path" Binding="{Binding PathDisplay}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+
+</UserControl>

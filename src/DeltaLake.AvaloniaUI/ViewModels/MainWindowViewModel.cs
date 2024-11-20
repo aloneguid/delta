@@ -48,6 +48,15 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
         private Table? _deltaTable;
 
         [ObservableProperty]
+        private bool _isPartitioned;
+
+        [ObservableProperty]
+        private ObservableCollection<string> ? _partitions;
+
+        [ObservableProperty]
+        private string? _partitionLabel;
+
+        [ObservableProperty]
         private long _selectedDeltaVersion;
 
         [ObservableProperty]
@@ -61,6 +70,9 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
 
         [ObservableProperty]
         private ObservableCollection<DataFile>? _dataFiles;
+
+        [ObservableProperty]
+        private DeltaDataViewModel _dataVm = new DeltaDataViewModel();
 
         [ObservableProperty]
         private DataFile? _selectedDataFile;
@@ -94,6 +106,12 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
 
             if(IsDeltaTablePath) {
                 DeltaTable = await Table.OpenAsync(_fs, FsPath);
+                DataVm.Table = DeltaTable;
+                IsPartitioned = DeltaTable.IsPartitioned;
+                Partitions = new ObservableCollection<string>(DeltaTable.PartitionColumns);
+                PartitionLabel = DeltaTable.IsPartitioned
+                    ? $"{DeltaTable.PartitionColumns.Count} partition(s)"
+                    : "not partitioned";
                 DeltaVersions = new ObservableCollection<long>(DeltaTable.Versions.OrderDescending());
                 SelectedDeltaVersion = DeltaVersions.First();
                 DataFiles = new ObservableCollection<DataFile>(DeltaTable.DataFiles);
@@ -103,6 +121,10 @@ namespace DeltaLake.AvaloniaUI.ViewModels {
                 SelectedLogCommit = DeltaHistory.FirstOrDefault();
             } else {
                 DeltaTable = null;
+                DataVm.Table = null;
+                IsPartitioned = false;
+                Partitions = null;
+                PartitionLabel = null;
                 DeltaVersions = null;
                 SelectedDeltaVersion = 0;
                 DataFiles = null;

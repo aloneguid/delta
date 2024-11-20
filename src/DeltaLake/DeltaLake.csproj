@@ -48,7 +48,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Parquet.Net" Version="5.0.2-pre.2" />
+        <PackageReference Include="Parquet.Net" Version="5.0.2" />
         <PackageReference Include="Stowage" Version="2.1.0-pre.2" />
     </ItemGroup>
 

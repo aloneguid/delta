@@ -5,7 +5,7 @@ using Stowage;
 namespace DeltaLake {
     public class DataFile : IEquatable<DataFile> {
 
-        public DataFile(FileBase fileAction, IOPath fullPath) {
+        public DataFile(FileBase fileAction, IOPath tablePath, IOPath relativePath) {
 
             BaseAction = fileAction;
 
@@ -14,7 +14,9 @@ namespace DeltaLake {
             if(fileAction.Timestamp == null)
                 throw new ArgumentException("Timestamp is required for DataFile");
 
-            Path = fullPath;
+            TablePath = tablePath;
+            RelativePath = relativePath;
+            Path = new IOPath(tablePath, relativePath);
             Size = fileAction.Size.Value;
             if(fileAction.PartitionValues != null) {
                 PartitionValues = fileAction.PartitionValues;
@@ -24,7 +26,11 @@ namespace DeltaLake {
 
         internal FileBase BaseAction { get; init; }
 
+        public IOPath TablePath { get; }
+
         public IOPath Path { get; }
+
+        public IOPath RelativePath { get; }
 
         public long Size { get; }
 

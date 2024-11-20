@@ -1,5 +1,7 @@
 ﻿using System;
 using Avalonia;
+using Projektanker.Icons.Avalonia.FontAwesome;
+using Projektanker.Icons.Avalonia;
 
 namespace DeltaLake.AvaloniaUI {
     internal sealed class Program {
@@ -11,10 +13,16 @@ namespace DeltaLake.AvaloniaUI {
             .StartWithClassicDesktopLifetime(args);
 
         // Avalonia configuration, don't remove; also used by visual designer.
-        public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
+        public static AppBuilder BuildAvaloniaApp() {
+
+            IconProvider.Current
+                .Register<FontAwesomeIconProvider>();
+
+
+            return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace();
+        }
     }
 }

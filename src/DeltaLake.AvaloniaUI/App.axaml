@@ -9,10 +9,13 @@
     <Application.Styles>
         <FluentTheme DensityStyle="Compact" />
         <StyleInclude Source="/Styles.axaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>
         <actipro:ModernTheme>
             <actipro:ModernTheme.Definition>
                 <generation:ThemeDefinition UserInterfaceDensity="Normal" />
             </actipro:ModernTheme.Definition>
         </actipro:ModernTheme>
+        <actipro:ModernTheme Includes="NativeDataGrid"/>
     </Application.Styles>
 </Application>

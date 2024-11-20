@@ -1,8 +1,11 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:DeltaLake.AvaloniaUI.ViewModels"
+             xmlns:vw="clr-namespace:DeltaLake.AvaloniaUI;assembly=DeltaLake.AvaloniaUI"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:actipro="http://schemas.actiprosoftware.com/avaloniaui"
+             xmlns:i="https://github.com/projektanker/icons.avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DeltaLake.AvaloniaUI.DeltaBrowserControl"
              x:DataType="vm:MainWindowViewModel">
@@ -10,79 +13,46 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Horizontal">
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="5">
             <Image Source="/Assets/delta.png" Height="15"/>
             <TextBlock Text="version" Padding="5,0,0,0" VerticalAlignment="Center"/>
-            <ComboBox ItemsSource="{Binding DeltaVersions}"
-                      SelectedItem="{Binding SelectedDeltaVersion}"/>
+            <TextBlock Text="{Binding SelectedDeltaVersion}" Padding="5,0,0,0" VerticalAlignment="Center"/>
+
+            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                <i:Icon Value="fa-solid fa-cheese" Margin="0,0,5,0"/>
+                <TextBlock Text="not partitioned"/>
+            </StackPanel>
         </StackPanel>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="4"/>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="4"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+        <TabControl Classes="theme-outline" TabStripPlacement="Bottom" Grid.Row="1"
+            BorderThickness="0,0,0,1"
+            Padding="0">
+            <TabControl.Resources>
+                <SolidColorBrush x:Key="{actipro:ThemeResourceKey TabItemBorderBrushOutline}" Color="Transparent" />
+                <Thickness x:Key="{actipro:ThemeResourceKey TabControlHeaderPaddingOutline}">3,0,3,3</Thickness>
+            </TabControl.Resources>
 
-            <StackPanel Orientation="Vertical" Grid.Column="0">
-                <TextBlock Text="Data files"/>
-                <ListBox ItemsSource="{Binding DataFiles}"
-                            SelectedItem="{Binding SelectedDataFile}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Path}" Padding="0" Margin="0"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.Styles>
-                        <Style Selector="ListBoxItem">
-                            <Setter Property="Padding" Value="2"/>
-                        </Style>
-                    </ListBox.Styles>
-                </ListBox>
-            </StackPanel>
+            <TabItem Header="Data">
+                <vw:DeltaDataControl DataContext="{Binding DataVm}"/>
+            </TabItem>
 
-            <StackPanel Orientation="Vertical" Grid.Column="2">
-                <TextBlock Text="Log commits"/>
-                <ListBox ItemsSource="{Binding DeltaHistory}"
-                            SelectedItem="{Binding SelectedLogCommit}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding File.Name}" Padding="0" Margin="0"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.Styles>
-                        <Style Selector="ListBoxItem">
-                            <Setter Property="Padding" Value="2"/>
-                        </Style>
-                    </ListBox.Styles>
-                </ListBox>
-            </StackPanel>
-
-
-
-
-            <StackPanel Orientation="Vertical" Grid.Column="4">
-                <TextBlock Text="Actions"/>
-                <ListBox ItemsSource="{Binding SelectedLogCommit.Actions}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" Padding="0" Margin="0"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.Styles>
-                        <Style Selector="ListBoxItem">
-                            <Setter Property="Padding" Value="2"/>
-                        </Style>
-                    </ListBox.Styles>
-
-                </ListBox>
-            </StackPanel>
-
-        </Grid>
-    </StackPanel>
-
+            <TabItem Header="History">
+                <DataGrid ItemsSource="{Binding DeltaHistory}"
+                          Padding="0" Margin="0" BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Version" Binding="{Binding Version}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+          
+        </TabControl>
+    </Grid>
 
 </UserControl>
