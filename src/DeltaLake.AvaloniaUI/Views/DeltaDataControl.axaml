@@ -10,27 +10,9 @@
         <vm:DeltaDataViewModel/>
     </Design.DataContext>
 
-    <Grid>        
-        <DataGrid ItemsSource="{Binding DataFiles}"
-                  Padding="0" Margin="0" BorderThickness="0">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Partitions">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ItemsControl ItemsSource="{Binding DataFile.PartitionValues}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding}"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Size" Binding="{Binding SizeDisplay}"/>
-                <DataGridTextColumn Header="Relative path" Binding="{Binding PathDisplay}"/>
-            </DataGrid.Columns>
-        </DataGrid>
+    <Grid>
+        <TreeDataGrid
+            Source="{Binding PartitionNodes}"
+            FontFamily="Inter" FontSize="12"/>
     </Grid>
-
 </UserControl>

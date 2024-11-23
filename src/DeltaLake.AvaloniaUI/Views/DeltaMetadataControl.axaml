@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:DeltaLake.AvaloniaUI.ViewModels"
+             xmlns:conv="using:DeltaLake.AvaloniaUI.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DeltaLake.AvaloniaUI.DeltaMetadataControl"
+             x:DataType="vm:MainWindowViewModel">
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <conv:GenericConverter x:Key="gc"/>
+    </UserControl.Resources>
+
+    <StackPanel>
+
+        <StackPanel Classes="metarow">
+            <TextBlock Text="Id"/>
+            <TextBlock Text="{Binding DeltaTable.Metadata.Id}"/>
+        </StackPanel>
+
+        <StackPanel Classes="metarow">
+            <TextBlock Text="Name"/>
+            <TextBlock Text="{Binding DeltaTable.Metadata.Name}"/>
+        </StackPanel>
+
+        <StackPanel Classes="metarow">
+            <TextBlock Text="Description"/>
+            <TextBlock Text="{Binding DeltaTable.Metadata.Description}"/>
+        </StackPanel>
+
+        <StackPanel Classes="metarow">
+            <TextBlock Text="Format"/>
+            <TextBlock Text="{Binding DeltaTable.Metadata.Format}"/>
+        </StackPanel>
+
+        <StackPanel Classes="metarow">
+            <TextBlock Text="Schema string"/>
+            <TextBlock Text="{Binding DeltaTable.Metadata.SchemaString}"/>
+        </StackPanel>
+
+        <StackPanel Classes="metarow">
+            <TextBlock Text="Partitions"/>
+            <TextBlock Text="{Binding DeltaTable.Metadata.PartitionColumns, Converter={StaticResource gc}}"/>
+        </StackPanel>
+
+        <StackPanel Classes="metarow">
+            <TextBlock Text="Created"/>
+            <TextBlock Text="{Binding DeltaTable.Metadata.CreatedTimeDateTime}"/>
+        </StackPanel>
+
+        <StackPanel Classes="metarow">
+            <TextBlock Text="Configuration"/>
+            <TextBlock Text="{Binding DeltaTable.Metadata.Configuration, Converter={StaticResource gc}}"/>
+        </StackPanel>
+
+
+    </StackPanel>
+</UserControl>

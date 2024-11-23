@@ -48,4 +48,11 @@
     <ItemGroup>
         <ProjectReference Include="..\DeltaLake\DeltaLake.csproj" />
     </ItemGroup>
+
+
+    <ItemGroup>
+      <Compile Update="Views\DeltaMetadataControl.axaml.cs">
+        <DependentUpon>DeltaMetadataControl.axaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>

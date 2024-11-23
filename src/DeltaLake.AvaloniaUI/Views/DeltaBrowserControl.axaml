@@ -51,7 +51,11 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-          
+
+            <TabItem Header="Metadata">
+                <vw:DeltaMetadataControl/>
+            </TabItem>
+
         </TabControl>
     </Grid>
 

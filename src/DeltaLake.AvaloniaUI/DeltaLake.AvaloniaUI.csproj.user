@@ -4,6 +4,6 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>dq data ddap</ActiveDebugProfile>
+    <ActiveDebugProfile>ut data</ActiveDebugProfile>
   </PropertyGroup>
 </Project>
