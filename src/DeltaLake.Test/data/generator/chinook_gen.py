@@ -31,8 +31,15 @@ artist_df = read_csv("Artist")
 track_df = read_csv("Track")
 playlist_df = read_csv("Playlist")
 playlist_track_df = read_csv("PlaylistTrack")
+artist_df = (artist_df
+             .withColumn("ArtistId", f.col("ArtistId").cast(IntegerType()))
+             .withColumn("Name", f.col("Name").cast(StringType())))
 
-artist_df = artist_df.withColumn("ArtistId", f.col("ArtistId").cast(IntegerType())).withColumn("Name", f.col("Name").cast(StringType()))
+# add row number to track_df
+track_df_rn = (track_df
+            .withColumn("rn", f.monotonically_increasing_id())
+            .select("rn", *track_df.columns))
+track_df_count = track_df.count()
 
 # add row number column to artist_df with increasing values, this will be useful for values partitioning and data generation
 artist_df_rn = (artist_df
@@ -86,3 +93,28 @@ print("done")
  .save(os.path.join(TARGET_DIR, "track.partitioned.mediatypeid")))
 
 
+#%%
+
+# trickling partitioned data with checkpointing
+
+batch_size = 100
+
+for i in range(1, track_df_count + 1, batch_size):
+    # generate microbatch
+    df_1 = track_df_rn.filter(track_df_rn.rn >= i).filter(track_df_rn.rn < i + batch_size)
+    df_1.show()
+    df_1 = df_1.drop("rn")
+    df_1.show()
+
+    # write microbatch
+    print("-----")
+    print(f"writing microbatch {i}+{batch_size}/{track_df_count}")
+    (df_1
+     .repartition(1)
+     .write
+     .partitionBy("MediaTypeId")
+     .format("delta")
+     .mode("append" if i > 1 else "overwrite")
+     .save(os.path.join(TARGET_DIR, "track.partitioned.mediatypeid.trickle")))
+
+print("done")

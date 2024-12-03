@@ -28,19 +28,19 @@
 
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.2.1" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.1" />
+        <PackageReference Include="Avalonia" Version="11.2.2" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.2" />
         <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.10" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.2" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.2" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.2" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.1" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.2" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
         <PackageReference Include="ActiproSoftware.Controls.Avalonia" Version="25.1.0" />
         <PackageReference Include="ActiproSoftware.Controls.Avalonia.Themes.DataGrid" Version="25.1.0" />
-        <PackageReference Include="Projektanker.Icons.Avalonia" Version="9.4.3" />
-        <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.4.3" />
+        <PackageReference Include="Projektanker.Icons.Avalonia" Version="9.5.0" />
+        <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.5.0" />
 
     </ItemGroup>
 

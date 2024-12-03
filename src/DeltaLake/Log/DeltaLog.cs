@@ -33,6 +33,8 @@ namespace DeltaLake.Log {
             long.TryParse(vs, out long v);
             return v;
         }
+
+        public override string ToString() => $"{Version} {Entry.Name}";
     }
 
     /// <summary>
@@ -53,11 +55,6 @@ namespace DeltaLake.Log {
             _location = location;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="compact">When true, the minimum about of files will be returned</param>
-        /// <returns></returns>
         private async Task<IReadOnlyCollection<LogEntry>> ListLogEntries() {
             // Delta log files are stored as JSON in a directory at the root of the table named _delta_log,
             // and together with checkpoints make up the log of all changes that have occurred to a table.
@@ -81,7 +78,7 @@ namespace DeltaLake.Log {
 
             // filter out json entries with version less than max checkpoint
             return logEntries
-                .Where(e => !e.IsJson || e.Version > maxCheckpointVersion)
+                .Where(e => e.Version >= maxCheckpointVersion)
                 .ToList();
         }
 
