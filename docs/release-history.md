@@ -5,4 +5,3 @@ This is the first public version of the DeltaIO library. The aim of this release
 ### What's actually working
 
 - Reading delta log, all known operations are supported.
-- 

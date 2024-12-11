@@ -96,6 +96,7 @@ Bookmark, star, start discussions, spread the word if you are interested in the 
 
 - [Delta Transaction Log Protocol](https://github.com/delta-io/delta/blob/master/PROTOCOL.md).
 - [Delta Kernel](https://docs.delta.io/latest/delta-kernel.html).
+- [Delta Kernel source code](https://github.com/delta-io/delta) ([vs code](https://github.dev/delta-io/delta)).
 - [Integration Test Dataset](https://github.com/delta-io/delta-rs/tree/main/crates/test/tests/data).
 - Alternative implementations
   - [delta-net](https://github.com/johnsusi/delta-net) - an early prototype as of late 2024.
